@@ -309,6 +309,16 @@ void execute(char *cmdline) {
 	set_input_mode();
 }
 
+void append_to_history(char *cmdline) {
+	if (history_size >= MAX_HISTORY_SIZE) {
+		error("too many history entries");
+	}
+	int len = strlen(cmdline);
+	history[history_size] = malloc(len + 1);
+	strncpy(history[history_size], cmdline, len + 1);
+	history_size++;
+}
+
 void restore_terminal() {
 	// reset color
 	fprintf(stderr, "%s", NORMAL);
