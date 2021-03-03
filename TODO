@@ -1,0 +1,31 @@
+new re-search
+=============
+
+- Gestartet durch Ctrl-R
+- List aus $history, statt aus Datei
+- Sollte auch mit Alt-F, Alt-B, etc. beendbar sein und sollte die
+  entsprechende Operation danach in Fish ausführen.
+  Dazu muss ein entsprechender Exitcode an die Shell übergeben werden, der
+  von der fish-Funktion ausgewertet werden kann
+- vollständige Bearbeitung der Befehlszeile innerhalb re-search erlauben.
+  Das wäre dann ein weiterer Modus.
+
+Unterstützung von Ctrl-O
+------------------------
+
+Ctrl-O geht grundsätzlich. Aber nur so wie der Eintrag bereits ist.
+Will man ihn bearbeiten, geht das nicht.
+
+Die Bearbeitung des aktuellen Eintragsnur rudimentär (innerhalb
+re-search) erlauben? Damit würde Ctrl-O sogar mit bearbeiteten Einträgen
+funktionieren. Der aktuelle Eintrag wird bearbeitet, der nachfolgende aber
+steht mit Ctrl-O wieder bereit.
+
+Bei zu langer History abschneiden
+---------------------------------
+
+Im Moment steigt das Programm aus. Dabei wäre es sinnvoller einfach die zu
+vielen (die ältesten) Einträge abzuschneiden.
+Das muss auch bei ctrl-o beachtet werden, da dort ja jeweils ein neuer
+Eintrag dazu kommt. Damit muss man den ältesten wegwerfen.
+Wie geht das denn effizient?
