@@ -62,6 +62,7 @@ to bind it to the "Up" arrow.
 * C-c, C-g, left, esc, home: cancel search.
 * C-e, right, end: accept result.
 * C-l: clear screen
+* C-o: execute current entry and jump the next one in history.
 * C-q: save search result and start sub-search.
 * C-u: delete the current search term
 * C-w: delete a word backwards

@@ -3,7 +3,7 @@ function re_search
   history --null --reverse -n (echo "1024 * 256" | bc) > "$fish_history_file"
 	set -l tmp (mktemp -t fish.XXXXXX)
 	set -x SEARCH_BUFFER (commandline -b)
-	re-search > $tmp
+	re-search $tmp
 	set -l res $status
 	commandline -f repaint
 	if [ -s $tmp ]
