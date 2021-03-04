@@ -18,7 +18,7 @@ Unterstützung von Ctrl-O
 Ctrl-O geht grundsätzlich. Aber nur so wie der Eintrag bereits ist.
 Will man ihn bearbeiten, geht das nicht.
 
-Die Bearbeitung des aktuellen Eintragsnur rudimentär (innerhalb
+Die Bearbeitung des aktuellen Eintrags nur rudimentär (innerhalb
 re-search) erlauben? Damit würde Ctrl-O sogar mit bearbeiteten Einträgen
 funktionieren. Der aktuelle Eintrag wird bearbeitet, der nachfolgende aber
 steht mit Ctrl-O wieder bereit.
@@ -42,24 +42,3 @@ werden soll? Dafür muss man hin und her springen können.
 Auch fehlen natürlich fortgeschrittene Funktionen der Shell (suggestions
 zum Beispiel; Tab-Completion für Dateien und Pfade könnte man
 nachimplementieren, wäre aber wohl aufwändig).
-
-Ignoriere unbekannte Tastendrücke
----------------------------------
-
-Bis auf die Tasten, die explizit funktionieren (ctrl-w, ctrl-o, etc.)
-führen alle eine neue Suche aus. Das muss geändert werden. Nur Ctrl-S,
-Ctrl-R, Pfeil hoch, Pfeil runter sollten wirklich weiter suchen. Andere
-Tasten sollten einfach nichts tun.
-
-Aufpassen. Die ganzen Alt-Keys werden interpretiert, als ob Alt nicht
-gedrückt wäre. Das könnte man doch auch ändern.
-
-Mehrzeile History-Einträge
---------------------------
-
-Mehrzeilige Einträge werden nicht korrekt behandelt. Das '\n' wird literal
-ausgegeben.
-Das steht offenbar so im fish history file. Ein echt literales '\n' ist
-wiederum mit einem '\' escaped, also '\\n'.
-Bei der Bash history ist das anders. Dort wird das '\n' einfach
-rausgefiltert. Das ist dann nicht mehr vorhanden.
