@@ -29,6 +29,7 @@
 #define RED  "\x1B[31m"
 #define GREEN  "\x1B[32m"
 #define CYAN   "\x1B[36m"
+#define BOLD   "\x1B[1m"
 
 #define XSTR(A) STR(A)
 #define STR(A) #A
@@ -92,7 +93,7 @@
 		} \
 		if (strlen(result) > 0) { \
 			/* print the actual result */ \
-			fprintf(stderr, " [%s%s%s]", NORMAL, result, CYAN); \
+			fprintf(stderr, " [%s%s%s%s%s]", NORMAL, BOLD, result, NORMAL, CYAN); \
 		} \
 		/* restore cursor position */ \
 		fprintf(stderr, "\033[u"); \
