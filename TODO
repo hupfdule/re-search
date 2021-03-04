@@ -53,3 +53,13 @@ Tasten sollten einfach nichts tun.
 
 Aufpassen. Die ganzen Alt-Keys werden interpretiert, als ob Alt nicht
 gedrückt wäre. Das könnte man doch auch ändern.
+
+Mehrzeile History-Einträge
+--------------------------
+
+Mehrzeilige Einträge werden nicht korrekt behandelt. Das '\n' wird literal
+ausgegeben.
+Das steht offenbar so im fish history file. Ein echt literales '\n' ist
+wiederum mit einem '\' escaped, also '\\n'.
+Bei der Bash history ist das anders. Dort wird das '\n' einfach
+rausgefiltert. Das ist dann nicht mehr vorhanden.
