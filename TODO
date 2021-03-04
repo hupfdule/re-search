@@ -3,6 +3,8 @@ new re-search
 
 - Gestartet durch Ctrl-R
 - List aus $history, statt aus Datei
+  Nein, das ist Mist. Dort werden doppelte Einträge (selbst, wenn sie nicht
+  direkt nacheinander kamen) herausgefiltert. Das ist Mist für Ctrl-O.
 - Sollte auch mit Alt-F, Alt-B, etc. beendbar sein und sollte die
   entsprechende Operation danach in Fish ausführen.
   Dazu muss ein entsprechender Exitcode an die Shell übergeben werden, der
@@ -21,11 +23,22 @@ re-search) erlauben? Damit würde Ctrl-O sogar mit bearbeiteten Einträgen
 funktionieren. Der aktuelle Eintrag wird bearbeitet, der nachfolgende aber
 steht mit Ctrl-O wieder bereit.
 
-Bei zu langer History abschneiden
----------------------------------
+Die aktuelle Implementation von Ctrl-O fügt die wieder ausgeführten
+Kommandos nicht der tatsächlichen fish history hinzu. Sobald re-search
+beendet wurde, sind diese also nicht die neuesten Einträge.
 
-Im Moment steigt das Programm aus. Dabei wäre es sinnvoller einfach die zu
-vielen (die ältesten) Einträge abzuschneiden.
-Das muss auch bei ctrl-o beachtet werden, da dort ja jeweils ein neuer
-Eintrag dazu kommt. Damit muss man den ältesten wegwerfen.
-Wie geht das denn effizient?
+readline Funktionalität
+-----------------------
+
+Im Moment werden ausgewählte readline-Funktionen nachimplementiert (ctrl-w,
+ctrl-u, ctrl-h). Es wäre schön, wenn der aktuelle Suchbegriff vollständig
+readline-basiert bearbeitet werden könnte (mit M-b, M-f, C-a, etc.).
+
+Auch für die Bearbeitung des aktuell ausgewählten Prompts wäre das schön
+(eigentlich nur bei ctrl-o, da ansonsten ja die Kommandozeile in fish
+selbst bearbeitet werden kann). Aber wie unterscheide ich, was bearbeitet
+werden soll? Dafür muss man hin und her springen können.
+
+Auch fehlen natürlich fortgeschrittene Funktionen der Shell (suggestions
+zum Beispiel; Tab-Completion für Dateien und Pfade könnte man
+nachimplementieren, wäre aber wohl aufwändig).
