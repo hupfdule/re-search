@@ -50,3 +50,6 @@ Bis auf die Tasten, die explizit funktionieren (ctrl-w, ctrl-o, etc.)
 führen alle eine neue Suche aus. Das muss geändert werden. Nur Ctrl-S,
 Ctrl-R, Pfeil hoch, Pfeil runter sollten wirklich weiter suchen. Andere
 Tasten sollten einfach nichts tun.
+
+Aufpassen. Die ganzen Alt-Keys werden interpretiert, als ob Alt nicht
+gedrückt wäre. Das könnte man doch auch ändern.
