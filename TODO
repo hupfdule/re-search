@@ -42,3 +42,11 @@ werden soll? Dafür muss man hin und her springen können.
 Auch fehlen natürlich fortgeschrittene Funktionen der Shell (suggestions
 zum Beispiel; Tab-Completion für Dateien und Pfade könnte man
 nachimplementieren, wäre aber wohl aufwändig).
+
+Ignoriere unbekannte Tastendrücke
+---------------------------------
+
+Bis auf die Tasten, die explizit funktionieren (ctrl-w, ctrl-o, etc.)
+führen alle eine neue Suche aus. Das muss geändert werden. Nur Ctrl-S,
+Ctrl-R, Pfeil hoch, Pfeil runter sollten wirklich weiter suchen. Andere
+Tasten sollten einfach nichts tun.
