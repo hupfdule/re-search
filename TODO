@@ -27,6 +27,13 @@ Die aktuelle Implementation von Ctrl-O fügt die wieder ausgeführten
 Kommandos nicht der tatsächlichen fish history hinzu. Sobald re-search
 beendet wurde, sind diese also nicht die neuesten Einträge.
 
+Ctrl-O schreibt nicht in history
+--------------------------------
+
+Der Weg, den ich gehe, um den Befehl auszuführen, schreibt nicht in die
+History. Das ist Mist. Warum eigentlich nicht? Evtl. muss ich das ganz
+manuell machen. Etwa so hier: https://stackoverflow.com/a/32059902/572645
+
 readline Funktionalität
 -----------------------
 
@@ -42,3 +49,4 @@ werden soll? Dafür muss man hin und her springen können.
 Auch fehlen natürlich fortgeschrittene Funktionen der Shell (suggestions
 zum Beispiel; Tab-Completion für Dateien und Pfade könnte man
 nachimplementieren, wäre aber wohl aufwändig).
+
