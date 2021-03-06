@@ -50,3 +50,7 @@ Auch fehlen natürlich fortgeschrittene Funktionen der Shell (suggestions
 zum Beispiel; Tab-Completion für Dateien und Pfade könnte man
 nachimplementieren, wäre aber wohl aufwändig).
 
+Ctrl-p/Ctrl-n funktioniert nicht nach Ctrl-q
+--------------------------------------------
+
+Da passiert einfach nichts
