@@ -34,6 +34,19 @@ Der Weg, den ich gehe, um den Befehl auszuführen, schreibt nicht in die
 History. Das ist Mist. Warum eigentlich nicht? Evtl. muss ich das ganz
 manuell machen. Etwa so hier: https://stackoverflow.com/a/32059902/572645
 
+ACHTUNG! Wir müssen unterscheiden zwischen Bash und Fish. Die schreiben
+nicht nur in unterschiedliche Dateien, sondern haben auch jeweils ein
+anderes Format. Klappt das mit Bash überhaupt?
+
+Der Gesamtpfad zum History-File muss dann auch global gespeichert werden.
+
+Bash und Fish gleichzeitig unterstützen
+---------------------------------------
+
+Dann gibt's da kein Compileflag, sondern es muss geprüft werden, was die
+jeweils aktuelle Shell ist und entsprechend umgeschaltet werden. Das muss
+aber nur beim Programmstart passieren.
+
 readline Funktionalität
 -----------------------
 
