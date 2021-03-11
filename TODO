@@ -47,6 +47,13 @@ Dann gibt's da kein Compileflag, sondern es muss geprüft werden, was die
 jeweils aktuelle Shell ist und entsprechend umgeschaltet werden. Das muss
 aber nur beim Programmstart passieren.
 
+$XDG_DATA_HOME auswerten
+------------------------
+
+$HOME/.local/share ist grad hard konfiguriert. Das sollte umgestellt werden
+und nur der harte Pfad genutzt werden, wenn $XDG_DATA_HOME leer ist.
+
+
 readline Funktionalität
 -----------------------
 
