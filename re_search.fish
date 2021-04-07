@@ -1,4 +1,6 @@
 function re_search
+	set -x fish_history_file (mktemp -t fish.hist.XXXXXX)
+  history --null --reverse -n (echo "1024 * 256" | bc) > "$fish_history_file"
 	set -l tmp (mktemp -t fish.XXXXXX)
 	set -x SEARCH_BUFFER (commandline -b)
 	re-search $tmp
@@ -10,5 +12,5 @@ function re_search
 	if [ $res = 0 ]
 		commandline -f execute
 	end
-	rm -f $tmp
+	rm -f $tmp $fish_history_file
 end

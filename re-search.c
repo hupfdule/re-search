@@ -35,7 +35,7 @@
 #define STR(A) #A
 
 #define MAX_INPUT_LEN 100
-#define MAX_LINE_LEN 512
+#define MAX_LINE_LEN 4096
 #define MAX_HISTORY_SIZE (1024 * 256)
 
 #ifdef DEBUG
@@ -189,38 +189,25 @@ int append_to_history(const char *cmdline) {
 	return 0;
 }
 
-int parse_history() {
-	debug("parse history");
-
-	char *histpath;
-	char histfile[1024];
-	FILE* fp;
-	char cmdline[MAX_LINE_LEN];
-	int i,j,len;
-#ifdef CHECK_DUPLICATES
-	int k,dup;
-#endif
-
 #ifdef BASH
-	histpath = "."
-	histfile = ".bash_history";
-	snprintf(histfile, sizeof(histfile), ".bash_history", fish_session);
-	fp = try_open_history(histpath, histfile);
-#else
-	char *fish_session = getenv("fish_history");
-	if (!fish_session) {
-		fish_session = "fish";
-	}
-	snprintf(histfile, sizeof(histfile), "%s_history", fish_session);
+/**
+ * Parse the bash history file.
+ * This is still the legacy code and can probably be accompanied by an
+ * additional method that reads from a file that is generated via bashs
+ * 'history' command.
+ * Every error will return 1, otherwise 0 is returned.
+ */
+int parse_bash_history() {
+	char *histpath;
+	char  histfile[1024];
+	FILE *fp;
+	char  cmdline[MAX_LINE_LEN];
+	int   len;
 
-	histpath = ".local/share/fish";
+	histpath = ".";
+	snprintf(histfile, sizeof(histfile), ".bash_history");
 	fp = try_open_history(histpath, histfile);
-	if (!fp && errno == ENOENT) {
-		debug("cannot open history file %s/%s/%s: %s", getenv("HOME"), histpath, histfile, strerror(errno));
-		histpath = ".config/fish";
-		fp = try_open_history(histpath, histfile);
-	}
-#endif
+
 	if (!fp) {
 		error("cannot open history file %s/%s/%s: %s", getenv("HOME"), histpath, histfile, strerror(errno));
 		return 1;
@@ -238,7 +225,68 @@ int parse_history() {
 		// skip if too short
 		if (len < MIN_CMD_LEN)
 			continue;
-#ifndef BASH
+
+		if (append_to_history(cmdline)) {
+			fclose(fp);
+			return 1;
+		}
+	}
+
+	fclose(fp);
+	return 0;
+}
+#endif
+
+/**
+ * Parse the fish history file via legacy code by reading from the file
+ * fish writes its history to. This has the drawback that it contains
+ * entries from other fish instances and there does not fully resemble the
+ * currents shell history. For that reason 'parse_fish_history()' is
+ * preferred.
+ * However, if 'parse_fish_history' fails or cannot be used, because the
+ * $fish_history_file environment variable is not set, this method can
+ * be used as fallback.
+ * Every error will return 1, otherwise 0 is returned.
+ */
+int parse_fish_history_legacy() {
+	char *histpath;
+	char  histfile[1024];
+	FILE *fp;
+	char  cmdline[MAX_LINE_LEN];
+	int   i,j,len;
+
+	char *fish_session = getenv("fish_history");
+	if (!fish_session) {
+		fish_session = "fish";
+	}
+	snprintf(histfile, sizeof(histfile), "%s_history", fish_session);
+
+	histpath = ".local/share/fish";
+	fp = try_open_history(histpath, histfile);
+	if (!fp && errno == ENOENT) {
+		debug("cannot open history file %s/%s/%s: %s", getenv("HOME"), histpath, histfile, strerror(errno));
+		histpath = ".config/fish";
+		fp = try_open_history(histpath, histfile);
+	}
+
+	if (!fp) {
+		error("cannot open history file %s/%s/%s: %s", getenv("HOME"), histpath, histfile, strerror(errno));
+		return 1;
+	}
+
+	// parse the history file
+	while (fgets(cmdline, sizeof(cmdline), fp) != NULL) {
+
+		// skip if truncated
+		len = strlen(cmdline);
+		if (len == 0 || cmdline[len - 1] != '\n')
+			continue;
+		cmdline[--len] = 0; // remove \n
+
+		// skip if too short
+		if (len < MIN_CMD_LEN)
+			continue;
+
 		// skip if pattern not matched
 		if (strncmp(CMD_PREFIX, cmdline, CMD_PREFIX_LEN) != 0)
 			continue;
@@ -259,7 +307,6 @@ int parse_history() {
 		}
 		cmdline[j] = '\0';
 		len = j;
-#endif
 
 		if (append_to_history(cmdline)) {
 			fclose(fp);
@@ -268,8 +315,72 @@ int parse_history() {
 	}
 
 	fclose(fp);
+	return 0;
+}
+
+/**
+ * Parse the fish history file specified via $fish_history_file.
+ * The files content _must_ be the output of 'history --null --reverse'.
+ * And it should already be limited via '-n' to MAX_HISTORY_SIZE.
+ * If the environment variable $fish_history_file does not exist,
+ * this method returns 1. If reading the file failed, it returns 2.
+ * If appending all the entries to the history fails, it returns 3.
+ * Otherwise it returns 0.
+ */
+int parse_fish_history() {
+	char *fish_history_file = getenv("fish_history_file");
+	if (fish_history_file == NULL) {
+		debug("$fish_history_file is not set");
+		return 1;
+	}
+
+	FILE *history_file= fopen(fish_history_file, "r");
+	if (history_file == NULL) {
+		error("error reading fish_history_file %s: %s", fish_history_file, strerror(errno));
+		return 2;
+	}
+
+	char cmdline[MAX_LINE_LEN];
+	int ch;
+	int len= 0;
+	int too_long= 0; // set to 1 if a commandline from the history is longer than MAX_LINE_LEN
+
+	while((ch=fgetc(history_file)) != EOF) {
+		if (len >= MAX_LINE_LEN - 1 && !too_long) {
+			too_long= 1;
+			len++;
+			continue;
+		}
+
+		if (ch == '\0') {
+			if (too_long) {
+				too_long = 0;
+				cmdline[len]='\0';
+				debug("commandline is too long (more than %i chars): %s", strlen(cmdline), cmdline);
+			} else {
+				cmdline[len]= '\0';
+				if (append_to_history(cmdline)) {
+					fclose(history_file);
+					return 3;
+				}
+			}
+			len= 0;
+		} else if (!too_long) {
+			cmdline[len++] = ch;
+		}
+	}
+
+	fclose(history_file);
+	return 0;
+}
 
 #ifdef CHECK_DUPLICATES
+/**
+ * Remove duplicate entries from the already parsed history.
+ */
+void remove_duplicates() {
+	int i,j,k,dup;
+
 	// check for duplicates, it is easier to do it afterward to preserve
 	// history order
 	k = 0;
@@ -291,11 +402,8 @@ int parse_history() {
 	}
 	// adjust history size
 	history_size = k;
-#endif
-
-	debug("%d entries loaded", history_size);
-	return 0;
 }
+#endif
 
 void execute(char *cmdline) {
 	// Execute commandline in a separate child process
@@ -392,10 +500,25 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 
 	// load history
-	if (parse_history()) {
+	int parsing_failed;
+#ifdef BASH
+	parsing_failed = parse_bash_history();
+#else
+	parsing_failed = parse_fish_history();
+	if (parsing_failed) {
+		parsing_failed = parse_fish_history_legacy();
+	}
+#endif
+	if (parsing_failed) {
 		free_history();
 		exit(EXIT_FAILURE);
 	}
+
+#ifdef CHECK_DUPLICATES
+	remove_duplicates();
+#endif
+
+	debug("%d entries loaded", history_size);
 
 	char c;
 
