@@ -477,6 +477,24 @@ void cancel() {
 	exit(SEARCH_CANCEL);
 }
 
+/**
+ * Writes the specified string to the file denoted by
+ * $fish_readline_cmd_file. The string should be a valid readline movement
+ * function name that can be correctly interpreted by fish.
+ *
+ * If the environment variable $fish_readline_cmd_file is not set, it does nothing.
+ */
+void write_readline_function(const char *readline_function) {
+	char *readline_function_file = getenv("fish_readline_cmd_file");
+	if (readline_function_file != NULL) {
+		FILE *fp= fopen(readline_function_file, "w");
+		if (fp != NULL) {
+			fputs(readline_function, fp);
+			fclose(fp);
+		}
+	}
+}
+
 int main(int argc, char **argv) {
 	// write either to stdout or the given file
 	if (argc == 1) {
@@ -635,6 +653,11 @@ int main(int argc, char **argv) {
 			break;
 
 		case 5: // C-e
+			accept(RESULT_EDIT);
+			break;
+
+		case 1: // C-a
+			write_readline_function("beginning-of-line");
 			accept(RESULT_EDIT);
 			break;
 
