@@ -26,10 +26,10 @@
 #include <sys/wait.h>
 
 #define NORMAL  "\x1B[0m"
-#define RED  "\x1B[31m"
-#define GREEN  "\x1B[32m"
-#define CYAN   "\x1B[36m"
-#define BOLD   "\x1B[1m"
+#define RED     "\x1B[31m"
+#define GREEN   "\x1B[32m"
+#define CYAN    "\x1B[36m"
+#define BOLD    "\x1B[1m"
 
 #define XSTR(A) STR(A)
 #define STR(A) #A
@@ -482,7 +482,8 @@ void cancel() {
  * $fish_readline_cmd_file. The string should be a valid readline movement
  * function name that can be correctly interpreted by fish.
  *
- * If the environment variable $fish_readline_cmd_file is not set, it does nothing.
+ * If the environment variable $fish_readline_cmd_file is not set, it does
+ * nothing.
  */
 void write_readline_function(const char *readline_function) {
 	char *readline_function_file = getenv("fish_readline_cmd_file");

@@ -2,7 +2,7 @@ function re_search
 	set -x fish_history_file (mktemp -t fish.hist.XXXXXX)
 	set -x fish_cursor_pos_file (mktemp -t fish.curs.XXXXXX)
 	set -x fish_readline_cmd_file (mktemp -t fish.rdln.XXXXXX)
-  history --null --reverse -n (echo "1024 * 256" | bc) > "$fish_history_file"
+	history --null --reverse -n (echo "1024 * 256" | bc) > "$fish_history_file"
 	set -l tmp (mktemp -t fish.XXXXXX)
 	set -x SEARCH_BUFFER (commandline -b)
 	re-search $tmp
