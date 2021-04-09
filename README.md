@@ -6,6 +6,10 @@ Basic incremental history search, implemented to be used with fish shell.
 It doesn't support all the terminal implementations because of some ANSI
 escape sequences used, and is only tested on GNU/Linux.
 
+This is a fork of
+[jbonjean/re-search](https://github.com/jbonjean/re-search) with a bunch of
+extensions. See [Changes to upstream](#changes-to-upstream) for a list of changes.
+
 ### Install
 
 * Compile and add the binary to your PATH.
@@ -125,3 +129,33 @@ re_search() {
 }
 bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
 ```
+
+### Changes to upstream
+
+- The history file is not read from `~/.local/share/fish/fish_history`, but
+  instead the `history` command is used. This has the huge advantage that
+  command from other fish instances will not be visible in the current
+  shell.  
+  This is especially important when using `Ctrl-p` for stepping back in
+  history as one would expected that those commands are exactly the last
+  commands of the current shell.  
+  Unfortunately this leads to a noticeable delay on starting re-search as
+  executing the `history` command takes quiet some time.
+
+- Support Ctrl-o to execute a line from the history and jump to the next
+  entry. This replicates the same behavior of Bash. This is still an
+  experimental feature and has a few drawbacks (for example the executed
+  commandlines are not added to the current fish shell).
+
+- Show the number of current/max history entries in the prompt.
+
+- Allow finishing the search with a lot of readline bindings (Ctrl-f,
+  Ctrl-e, Ctrl-a, Alt-b, Alt-f and some more obscure ones) and execute the
+  corresponding readline function in fishs commandline. Those readline
+  functions are executed from the position of the beginning of the search
+  string in the command line (as does Bashs history search).
+
+- Colorize the search string the found commandline and place the cursor at
+  the beginning of the search string in the commandline. This makes it
+  easier to spot the search string and to predict the behavior of executing
+  readline functions from that position.
