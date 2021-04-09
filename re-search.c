@@ -125,6 +125,7 @@ char buffer[MAX_INPUT_LEN];
 char saved[128];
 unsigned long history_size;
 int search_result_index;
+int substring_index;
 FILE *outfile;
 
 
@@ -478,6 +479,28 @@ void cancel() {
 }
 
 /**
+ * Writes the specified in to the file denoted by
+ * $fish_cursor_pos_file. But only if it is >= 0.
+ *
+ * If the environment variable $fish_cursor_pos_file is not set, it does
+ * nothing.
+ */
+void write_readline_position(const int readline_position) {
+	if (readline_position < 0) {
+		return;
+	}
+
+	char *readline_pos_file = getenv("fish_cursor_pos_file");
+	if (readline_pos_file != NULL) {
+		FILE *fp= fopen(readline_pos_file, "w");
+		if (fp != NULL) {
+			fprintf(fp, "%d", readline_position);
+			fclose(fp);
+		}
+	}
+}
+
+/**
  * Writes the specified string to the file denoted by
  * $fish_readline_cmd_file. The string should be a valid readline movement
  * function name that can be correctly interpreted by fish.
@@ -578,21 +601,26 @@ int main(int argc, char **argv) {
 	int noop = 0;
 	while (1) {
 		if (!noop && (buffer_pos > 0 || strlen(saved) > 0)) {
+			// FIXME: Where to reset substring_index?
 			// search in the history array
 			// TODO: factorize?
 			if (action == SEARCH_BACKWARD) {
 				for (i = search_result_index - 1; i >= 0; i--) {
-					if (strstr(history[i], buffer)) {
+					char *substring = strstr(history[i], buffer);
+					if (substring) {
 						search_index++;
 						search_result_index = i;
+						substring_index = substring - history[i];
 						break;
 					}
 				}
 			} else {
 				for (i = search_result_index + 1; i < history_size; i++) {
-					if (strstr(history[i], buffer)) {
+					char *substring = strstr(history[i], buffer);
+					if (substring) {
 						search_index--;
 						search_result_index = i;
+						substring_index = substring - history[i];
 						break;
 					}
 				}
