@@ -28,6 +28,7 @@
 #define NORMAL  "\x1B[0m"
 #define RED     "\x1B[31m"
 #define GREEN   "\x1B[32m"
+#define BLUE    "\x1B[1;34m"
 #define CYAN    "\x1B[36m"
 #define BOLD    "\x1B[1m"
 
@@ -107,6 +108,12 @@
 			if (substring_index > 0) { \
 				fprintf(stderr, "\033[%iC", substring_index); \
 			} \
+			/* save cursor position */ \
+			fprintf(stderr, "\033[s"); \
+			/* overwrite search string in different color */ \
+			fprintf(stderr, "%s%s", BLUE, buffer); \
+			/* restore cursor position */ \
+			fprintf(stderr, "\033[u"); \
 		} else { \
 			/* restore cursor position */ \
 			fprintf(stderr, "\033[u"); \
