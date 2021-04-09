@@ -20,5 +20,5 @@ function re_search
 	if [ $res = 0 ]
 		commandline -f execute
 	end
-	rm -f $tmp $fish_history_file
+	rm -f $tmp $fish_history_file $fish_cursor_pos_file $fish_readline_cmd_file
 end
