@@ -93,10 +93,24 @@
 		} \
 		if (strlen(result) > 0) { \
 			/* print the actual result */ \
-			fprintf(stderr, " [%s%s%s%s%s]", NORMAL, BOLD, result, NORMAL, CYAN); \
+			/* print opening bracket */ \
+			fprintf(stderr, " [%s", NORMAL); \
+			/* save cursor position */ \
+			fprintf(stderr, "\033[s"); \
+			/* print the actual result commandline */ \
+			fprintf(stderr, "%s%s%s", BOLD, result, NORMAL); \
+			/* print closing bracket */ \
+			fprintf(stderr, "%s]", CYAN); \
+			/* restore cursor position */ \
+			fprintf(stderr, "\033[u"); \
+			/* move to found search string */ \
+			if (substring_index > 0) { \
+				fprintf(stderr, "\033[%iC", substring_index); \
+			} \
+		} else { \
+			/* restore cursor position */ \
+			fprintf(stderr, "\033[u"); \
 		} \
-		/* restore cursor position */ \
-		fprintf(stderr, "\033[u"); \
 		/* restore to normal font */ \
 		fprintf(stderr, "%s", NORMAL); \
 	} while (0)
