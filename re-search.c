@@ -642,13 +642,51 @@ int main(int argc, char **argv) {
 
 		switch (c) {
 		case 27:
-			c = nb_getchar();
-			if (c == -1) { // esc
-				cancel();
-				break;
-			} else if (c != 91 && c != 79) {
-				ungetc(c, stdin);
-				break;
+			// Alt- key combinations
+			switch (nb_getchar()) {
+				case -1: // esc
+					cancel();
+					break;
+				case 98: // Alt-b
+					write_readline_position(substring_index);
+					write_readline_function("backward-word");
+					accept(RESULT_EDIT);
+					break;
+				case 102: // Alt-f
+					write_readline_position(substring_index);
+					write_readline_function("forward-word");
+					accept(RESULT_EDIT);
+					break;
+				case 100: // Alt-d
+					write_readline_position(substring_index);
+					write_readline_function("kill-word");
+					accept(RESULT_EDIT);
+					break;
+				case 127: // Alt-Backspace (Alt-DEL)
+					write_readline_position(substring_index);
+					write_readline_function("backward-kill-word");
+					accept(RESULT_EDIT);
+					break;
+				case 116: // Alt-t
+					write_readline_position(substring_index);
+					write_readline_function("transpose-words");
+					accept(RESULT_EDIT);
+					break;
+				case 117: // Alt-u
+					write_readline_position(substring_index);
+					write_readline_function("upcase-word");
+					accept(RESULT_EDIT);
+					break;
+				case 108: // Alt-l
+					write_readline_position(substring_index);
+					write_readline_function("downcase-word");
+					accept(RESULT_EDIT);
+					break;
+				case 99: // Alt-c
+					write_readline_position(substring_index);
+					write_readline_function("capitalize-word");
+					accept(RESULT_EDIT);
+					break;
 			}
 
 			// multi-characters sequence
@@ -682,6 +720,17 @@ int main(int argc, char **argv) {
 			break;
 
 		case 5: // C-e
+			accept(RESULT_EDIT);
+			break;
+
+		case 6: // C-f
+			write_readline_position(substring_index);
+			accept(RESULT_EDIT);
+			break;
+
+		case 11: // C-k
+			write_readline_position(substring_index);
+			write_readline_function("kill-line");
 			accept(RESULT_EDIT);
 			break;
 
