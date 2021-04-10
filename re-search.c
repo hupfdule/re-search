@@ -660,11 +660,14 @@ int main(int argc, char **argv) {
 		fflush(stderr);
 
 		c = getchar();
+		debug("\n1st received key: %i", c);
 
 		switch (c) {
 		case 27:
 			// Alt- key combinations
-			switch (nb_getchar()) {
+			c = nb_getchar();
+			debug("\n2nd received key: %i", c);
+			switch (c) {
 				case -1: // esc
 					cancel();
 					break;
@@ -711,7 +714,9 @@ int main(int argc, char **argv) {
 			}
 
 			// multi-characters sequence
-			switch (getchar()) {
+			c = getchar();
+			debug("\n3rd received key: %i", c);
+			switch (c) {
 			case 53: // pg-up
 				getchar();
 				/* no break */
