@@ -37,8 +37,7 @@ For example, you are looking for the git-clone command of couchbase repository,
 the following sequence shows how it could help you:
 
 * [C-r] clone
-* [C-q]
-* couchbase
+* [C-q] couchbase
 
 #### Enable bash-like history scrolling
 
@@ -59,20 +58,60 @@ bind \e\[A re_search_scroll
 ```
 to bind it to the "Up" arrow.
 
-### Internal key bindings
+### Key bindings
 
-* C-r, up, pg-up: backward search.
-* C-s, down, pg-down: forward search.
-* C-c, C-g, left, esc, home: cancel search.
-* C-e, right, end: accept result.
-* C-l: clear screen
-* C-o: execute current entry and jump the next one in history.
-* C-q: save search result and start sub-search.
-* C-u: delete the current search term
-* C-w: delete a word backwards
-* C-p: cycle through history backwards
-* C-n: cycle through history forwards
-* Enter: execute result.
+#### Cancelling the search
+
+Cancelling the search closes re-search in displays the shell prompt again
+without modification.
+
+* `Ctrl-c`
+* `Ctrl-g`
+* `Ctrl-d` (maybe changed in a the future to some other functionality)
+* `Left`
+* `Esc`
+
+#### Accepting the search result
+
+Accepting a search can be done with and without navigation / modification.
+
+* `Right` Accept and place cursor at the end of the commandline
+* `Ctrl-e` Accept and place cursor at the end of the commandline
+* `Ctrl-a` Accept and place cursor at the start of the commandline
+* `Enter` Accept and execute the result
+* `Ctrl-j` Accept and execute the result
+* `Ctrl-f` Accept and place cursor at the start of the search string
+
+* `Alt-b` Accept and execute readline `backward-word` function at the start of the search string
+* `Alt-f` Accept and execute readline `forward-word` function at the start of the search string
+* `Alt-d` Accept and execute readline `kill-word` function at the start of the search string
+* `Alt-Backspace` Accept and execute readline `backward-kill-word` function at the start of the search string
+* `Alt-t` Accept and execute readline `transpose-words` function at the start of the search string
+* `Alt-u` Accept and execute readline `upcase-word` function at the start of the search string
+* `Alt-l` Accept and execute readline `downcase-word` function at the start of the search string
+* `Alt-c` Accept and execute readline `capitalize-word` function at the start of the search string
+* `Ctrl-k` Accept and execute readline `kill-line` function at the start of the search string
+
+#### Modifying the search string
+
+* `Ctrl-h` Delete last character of the search string
+* `Backspace` Delete last character of the search string
+* `Ctrl-w` Delete last word of the search string
+* `Ctrl-u` Delete the whole search string
+
+#### Miscellaneous functions
+
+* `Ctrl-p` Step back one entry in the history
+* `Ctrl-n` Step forward one entry in the history
+* `Ctrl-r` Search backward for the search string
+* `Up` Search backward for the search string
+* `Page-Up` Search backward for the search string
+* `Ctrl-s` Search forward for the search string
+* `Down` Search forward for the search string
+* `Page-Down` Search forward for the search string
+* `Ctrl-l` Clear screen
+* `Ctrl-q` Start subsearch
+* `Ctrl-o` Execute the result and jump to the next history entry
 
 ### Customize the prompt
 
