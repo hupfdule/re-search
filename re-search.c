@@ -729,11 +729,11 @@ int main(int argc, char **argv) {
 			case 66: // down
 				action = SEARCH_FORWARD;
 				break;
-			case 70: // end
+			case 52: // end
 			case 67: // right
 				accept(RESULT_EDIT);
 				break;
-			case 72: // home
+			case 49: // home
 			case 68: // left
 				cancel();
 				break;
