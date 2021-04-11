@@ -540,6 +540,33 @@ void write_readline_function(const char *readline_function) {
 	}
 }
 
+
+// DEBUG
+void prompt_print_var(const char *var) {
+	if (strcmp(var, "action") == 0) {
+		// TODO
+		// parameters: term for backward, forward, scroll, execute
+		//             color for backward, forward, scroll, execute
+		// What about failure color? Yet another parameter?
+	} else if (strcmp(var, "subsearches") == 0) {
+		// TODO
+		// only a single string. Otherwise we would need parameters for
+		// before like "[" and after like "]"
+	} else if (strcmp(var, "search_term") == 0) {
+		// TODO
+	} else if (strcmp(var, "result_index") == 0) {
+		// TODO
+	} else if (strcmp(var, "history_index") == 0) {
+		// TODO
+	} else if (strcmp(var, "max_history_index") == 0) {
+		// TODO
+	} else if (strcmp(var, "history_entry") == 0) {
+		// TODO
+		// parameter: match color
+	}
+}
+// DEBUG END
+
 int main(int argc, char **argv) {
 	// write either to stdout or the given file
 	if (argc == 1) {
