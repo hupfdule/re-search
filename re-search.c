@@ -824,6 +824,14 @@ int main(int argc, char **argv) {
 			break;
 
 		case 21: // C-u
+			// when scrolling or executing from history end re-search and execute Ctrl-u
+			if (action == SCROLL || action == EXECUTE) {
+				write_readline_function("backward-kill-line");
+				accept(RESULT_EDIT);
+				break;
+			}
+
+			// otherwise delete the whole search string
 			buffer[0] = '\0';
 			buffer_pos = 0;
 
@@ -835,6 +843,14 @@ int main(int argc, char **argv) {
 			break;
 
 		case 23: // C-w
+			// when scrolling or executing from history end re-search and execute Ctrl-w
+			if (action == SCROLL || action == EXECUTE) {
+				write_readline_function("backward-kill-word");
+				accept(RESULT_EDIT);
+				break;
+			}
+
+			// otherwise delete last word of search
 			i = 0; // i == 1 means we have reached a non-space character
 			while (buffer_pos > 0) {
 				if (buffer[--buffer_pos] != ' ') {
@@ -880,6 +896,14 @@ int main(int argc, char **argv) {
 
 		case 127: // backspace
 		case 8: // backspace
+			// when scrolling or executing from history end re-search and execute Ctrl-h
+			if (action == SCROLL || action == EXECUTE) {
+				write_readline_function("backward-delete-char");
+				accept(RESULT_EDIT);
+				break;
+			}
+
+			// otherwise delete last word of search
 			if (buffer_pos > 0)
 				buffer[--buffer_pos] = '\0';
 
