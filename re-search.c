@@ -621,6 +621,14 @@ int main(int argc, char **argv) {
 
 	int noop = 0;
 	while (1) {
+		// place cursor at end of current history item (if there is one)
+		// in case a search string is entered it will be repositioned later
+		if (search_result_index < history_size) {
+			substring_index = strlen(history[search_result_index]);
+		} else {
+			substring_index = 0;
+		}
+
 		if (!noop && (buffer_pos > 0 || strlen(saved) > 0)) {
 			// FIXME: Where to reset substring_index?
 			// search in the history array
