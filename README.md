@@ -173,7 +173,7 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
 
 - The history file is not read from `~/.local/share/fish/fish_history`, but
   instead the `history` command is used. This has the huge advantage that
-  command from other fish instances will not be visible in the current
+  commands from other fish instances will not be visible in the current
   shell.  
   This is especially important when using `Ctrl-p` for stepping back in
   history as one would expected that those commands are exactly the last
