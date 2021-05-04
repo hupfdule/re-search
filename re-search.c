@@ -562,6 +562,25 @@ void write_readline_function(const char *readline_function) {
 	}
 }
 
+
+/**
+ * Writes the specified char to the file denoted by
+ * $fish_append_char_file.
+ *
+ * If the environment variable $fish_append_char is not set, it does
+ * nothing.
+ */
+void write_append_char(const int c) {
+	char *append_char_file = getenv("fish_append_char_file");
+	if (append_char_file != NULL) {
+		FILE *fp= fopen(append_char_file, "w");
+		if (fp != NULL) {
+			fprintf(fp, "%c", c);
+			fclose(fp);
+		}
+	}
+}
+
 int main(int argc, char **argv) {
 	// write either to stdout or the given file
 	if (argc == 1) {
@@ -963,6 +982,14 @@ int main(int argc, char **argv) {
 			// prevent buffer overflow
 			if (buffer_pos >= MAX_INPUT_LEN - 1)
 				continue;
+
+			// entering a printable character while scrolling ends the scrolling
+			// and appends the new character
+			if (action == SCROLL) {
+				write_append_char(c);
+			  accept(RESULT_EDIT);
+				break;
+			}
 
 			buffer[buffer_pos] = c;
 			buffer[++buffer_pos] = '\0';
