@@ -82,6 +82,7 @@ Accepting a search can be done with and without navigation / modification.
 * `Ctrl-j` Accept and execute the result
 * `Ctrl-f` Accept and place cursor at the start of the search string
 
+* `Ctrl-b` Accept and execute readline `backward-char` function at the start of the search string
 * `Alt-b` Accept and execute readline `backward-word` function at the start of the search string
 * `Alt-f` Accept and execute readline `forward-word` function at the start of the search string
 * `Alt-d` Accept and execute readline `kill-word` function at the start of the search string
@@ -189,12 +190,12 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
 - Show the number of current/max history entries in the prompt.
 
 - Allow finishing the search with a lot of readline bindings (Ctrl-f,
-  Ctrl-e, Ctrl-a, Alt-b, Alt-f and some more obscure ones) and execute the
-  corresponding readline function in fishs commandline. Those readline
-  functions are executed from the position of the beginning of the search
-  string in the command line (as does Bashs history search).
+  Ctrl-b, Ctrl-e, Ctrl-a, Alt-b, Alt-f and some more obscure ones) and
+  execute the corresponding readline function in fishs commandline. Those
+  readline functions are executed from the position of the beginning of the
+  search string in the command line (as does Bashs history search).
 
-- Colorize the search string the found commandline and place the cursor at
-  the beginning of the search string in the commandline. This makes it
+- Colorize the search string in the found commandline and place the cursor
+  at the beginning of the search string in the commandline. This makes it
   easier to spot the search string and to predict the behavior of executing
   readline functions from that position.
