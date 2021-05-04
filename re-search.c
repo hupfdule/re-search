@@ -803,6 +803,12 @@ int main(int argc, char **argv) {
 			accept(RESULT_EDIT);
 			break;
 
+		case 2: // C-b
+			write_readline_position(substring_index);
+			write_readline_function("backward-char");
+			accept(RESULT_EDIT);
+			break;
+
 		case 6: // C-f
 			write_readline_position(substring_index);
 			accept(RESULT_EDIT);
