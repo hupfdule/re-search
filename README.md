@@ -177,7 +177,7 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
   commands from other fish instances will not be visible in the current
   shell.  
   This is especially important when using `Ctrl-p` for stepping back in
-  history as one would expected that those commands are exactly the last
+  history as one would expect that those commands are exactly the last
   commands of the current shell.  
   Unfortunately this leads to a noticeable delay on starting re-search as
   executing the `history` command takes quiet some time.
