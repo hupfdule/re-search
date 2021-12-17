@@ -13,7 +13,7 @@ extensions. See [Changes to upstream](#changes-to-upstream) for a list of change
 ### Install
 
 * Compile and add the binary to your PATH.
-* Copy the file `re_search.fish` to the directory `~/.config/fish/functions/`.
+* Copy the files `re_search.fish` and `savehist.fish` to the directory `~/.config/fish/functions/`.
 * Add the binding to `~/.config/fish/functions/fish_user_key_bindings.fish`:
 ```
 bind \cr re_search
@@ -173,14 +173,14 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
 ### Changes to upstream
 
 - The history file is not read from `~/.local/share/fish/fish_history`, but
-  instead the `history` command is used. This has the huge advantage that
+  instead the `history` command is used and an event-handler function
+  `savehist` is registered for writing all executed commands to a re-search
+  specific temporary history file. This has the huge advantage that
   commands from other fish instances will not be visible in the current
   shell.  
   This is especially important when using `Ctrl-p` for stepping back in
   history as one would expect that those commands are exactly the last
   commands of the current shell.  
-  Unfortunately this leads to a noticeable delay on starting re-search as
-  executing the `history` command takes quiet some time.
 
 - Support Ctrl-o to execute a line from the history and jump to the next
   entry. This replicates the same behavior of Bash. This is still an

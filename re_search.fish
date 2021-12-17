@@ -1,9 +1,11 @@
 function re_search
-	set -x fish_history_file (mktemp -t fish.hist.XXXXXX)
+	if not [ -e /tmp/my_fish_history_$fish_pid ]
+		savehist
+	end
+	set -x fish_history_file /tmp/my_fish_history_$fish_pid
 	set -x fish_cursor_pos_file (mktemp -t fish.curs.XXXXXX)
 	set -x fish_readline_cmd_file (mktemp -t fish.rdln.XXXXXX)
 	set -x fish_append_char_file (mktemp -t fish.char.XXXXXX)
-	history --null --reverse -n (echo "1024 * 256" | bc) > "$fish_history_file"
 	set -l tmp (mktemp -t fish.XXXXXX)
 	set -x SEARCH_BUFFER (commandline -b)
 	re-search $tmp
@@ -24,5 +26,5 @@ function re_search
 	if [ $res = 0 ]
 		commandline -f execute
 	end
-	rm -f $tmp $fish_history_file $fish_cursor_pos_file $fish_readline_cmd_file $fish_append_char_file
+	rm -f $tmp $fish_cursor_pos_file $fish_readline_cmd_file $fish_append_char_file
 end
