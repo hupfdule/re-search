@@ -192,7 +192,7 @@ int set_input_mode() {
 }
 
 FILE *try_open_history(const char *local_path, const char *filename) {
-	char path[1024];
+	char path[1152];
 	snprintf(path, sizeof(path), "%s/%s/%s", getenv("HOME"), local_path, filename);
 	return fopen(path, "r");
 }
