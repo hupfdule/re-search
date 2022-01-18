@@ -5,6 +5,7 @@ function savehist --on-event fish_preexec
 	end
 
 	if not [ -z $argv ]
-		echo -n -E $argv'\0' >> $fish_pid_history_file
+		echo -n -E $argv >> $fish_pid_history_file
+		echo -n -e '\0'  >> $fish_pid_history_file
 	end
 end
