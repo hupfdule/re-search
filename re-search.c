@@ -130,13 +130,10 @@
 	} while (0)
 #endif /* PROMPT */
 
-#ifdef BASH
-	#define MIN_CMD_LEN 3
-#else
-	#define CMD_PREFIX "- cmd: "
-	#define CMD_PREFIX_LEN 7
-	#define MIN_CMD_LEN 10
-#endif /* BASH */
+#define BASH_MIN_CMD_LEN     3
+#define FISH_CMD_PREFIX      "- cmd: "
+#define FISH_CMD_PREFIX_LEN  7
+#define FISH_MIN_CMD_LEN     BASH_MIN_CMD_LEN + FISH_CMD_PREFIX_LEN
 
 typedef enum {
 	SEARCH_BACKWARD, SEARCH_FORWARD, SCROLL, EXECUTE,
@@ -147,6 +144,10 @@ typedef enum {
 	RESULT_EXECUTE = 0, SEARCH_CANCEL = 1, RESULT_EDIT = 10
 } exit_t;
 
+typedef enum {
+	FISH, BASH,
+} shell_t;
+
 struct termios saved_attributes;
 char *history[MAX_HISTORY_SIZE];
 char buffer[MAX_INPUT_LEN];
@@ -156,6 +157,7 @@ char subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
 int no_of_subsearches;
 int substring_index;
 FILE *outfile;
+shell_t shell;
 
 
 void reset_input_mode() {
@@ -219,7 +221,7 @@ int append_to_history(const char *cmdline) {
 	return 0;
 }
 
-#ifdef BASH
+
 /**
  * Parse the bash history file.
  * This is still the legacy code and can probably be accompanied by an
@@ -227,7 +229,7 @@ int append_to_history(const char *cmdline) {
  * 'history' command.
  * Every error will return 1, otherwise 0 is returned.
  */
-int parse_bash_history() {
+int parse_bash_history_legacy() {
 	char *histpath;
 	char  histfile[1024];
 	FILE *fp;
@@ -253,7 +255,7 @@ int parse_bash_history() {
 		cmdline[--len] = 0; // remove \n
 
 		// skip if too short
-		if (len < MIN_CMD_LEN)
+		if (len < BASH_MIN_CMD_LEN)
 			continue;
 
 		if (append_to_history(cmdline)) {
@@ -265,7 +267,56 @@ int parse_bash_history() {
 	fclose(fp);
 	return 0;
 }
-#endif
+
+/**
+ * Parse the bash history file specified via $bash_history_file.
+ * The files content _must_ be one command per line. It is _not_
+ * the direct output of `history` as that command prefixes each
+ * command with an id. This id (and the surrounding whitespace)
+ * must be stripped first.
+ * And it should already be limited to a length of MAX_HISTORY_SIZE.
+ * If the environment variable $bash_history_file does not exist,
+ * this method returns 1. If reading the file failed, it returns 2.
+ * If appending all the entries to the history fails, it returns 3.
+ * Otherwise it returns 0.
+ */
+int parse_bash_history() {
+	char *bash_history_file = getenv("bash_history_file");
+	if (bash_history_file == NULL) {
+		debug("$bash_history_file is not set");
+		return 1;
+	}
+
+	FILE *history_file= fopen(bash_history_file, "r");
+	if (history_file == NULL) {
+		error("error reading bash_history_file %s: %s", bash_history_file, strerror(errno));
+		return 2;
+	}
+
+	char  cmdline[MAX_LINE_LEN];
+	int   len= 0;
+
+	while (fgets(cmdline, sizeof(cmdline), history_file) != NULL) {
+		// skip if truncated
+		len = strlen(cmdline);
+		if (len == 0 || cmdline[len - 1] != '\n')
+			continue;
+		cmdline[--len] = 0; // remove \n
+
+		// skip if too short
+		if (len < BASH_MIN_CMD_LEN)
+			continue;
+
+		if (append_to_history(cmdline)) {
+			fclose(history_file);
+			return 1;
+		}
+	}
+
+	fclose(history_file);
+	return 0;
+}
+
 
 /**
  * Parse the fish history file via legacy code by reading from the file
@@ -314,15 +365,15 @@ int parse_fish_history_legacy() {
 		cmdline[--len] = 0; // remove \n
 
 		// skip if too short
-		if (len < MIN_CMD_LEN)
+		if (len < FISH_MIN_CMD_LEN)
 			continue;
 
 		// skip if pattern not matched
-		if (strncmp(CMD_PREFIX, cmdline, CMD_PREFIX_LEN) != 0)
+		if (strncmp(FISH_CMD_PREFIX, cmdline, FISH_CMD_PREFIX_LEN) != 0)
 			continue;
 
 		// sanitize
-		i = CMD_PREFIX_LEN; j = 0;
+		i = FISH_CMD_PREFIX_LEN; j = 0;
 		while (i < len) {
 			if (j > 0 && cmdline[i] == '\\' && cmdline[j-1] == '\\') {
 				j--;
@@ -581,6 +632,19 @@ void write_append_char(const int c) {
 	}
 }
 
+
+void check_shell() {
+	char* re_search_shell = getenv("RE_SEARCH_SHELL");
+	if (re_search_shell != NULL && strcmp(re_search_shell , "BASH") == 0) {
+		debug("Shell is BASH");
+		shell = BASH;
+	} else {
+		debug("Shell is FISH");
+		shell = FISH;
+	}
+}
+
+
 int main(int argc, char **argv) {
 	// write either to stdout or the given file
 	if (argc == 1) {
@@ -604,16 +668,23 @@ int main(int argc, char **argv) {
 	if (set_input_mode())
 		exit(EXIT_FAILURE);
 
+	// check which shells history to use
+	check_shell();
+
 	// load history
 	int parsing_failed;
-#ifdef BASH
-	parsing_failed = parse_bash_history();
-#else
-	parsing_failed = parse_fish_history();
-	if (parsing_failed) {
-		parsing_failed = parse_fish_history_legacy();
+	if (shell == BASH) {
+		parsing_failed = parse_bash_history();
+		if (parsing_failed) {
+			parsing_failed = parse_bash_history_legacy();
+		}
+	} else {
+		parsing_failed = parse_fish_history();
+		if (parsing_failed) {
+			parsing_failed = parse_fish_history_legacy();
+		}
 	}
-#endif
+
 	if (parsing_failed) {
 		free_history();
 		exit(EXIT_FAILURE);
@@ -993,7 +1064,7 @@ int main(int argc, char **argv) {
 			// and appends the new character
 			if (action == SCROLL) {
 				write_append_char(c);
-			  accept(RESULT_EDIT);
+				accept(RESULT_EDIT);
 				break;
 			}
 
