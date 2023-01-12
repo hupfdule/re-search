@@ -75,49 +75,49 @@ without modification.
 
 Accepting a search can be done with and without navigation / modification.
 
-* `Right` Accept and place cursor at the end of the commandline
-* `Ctrl-e` Accept and place cursor at the end of the commandline
-* `End` Accept and place cursor at the end of the commandline
-* `Ctrl-a` Accept and place cursor at the start of the commandline
-* `Home` Accept and place cursor at the start of the commandline
-* `Enter` Accept and execute the result
-* `Ctrl-j` Accept and execute the result
-* `Ctrl-f` Accept and place cursor at the start of the search string
+* `Right`         Accept and place cursor at the end of the commandline
+* `Ctrl-e`        Accept and place cursor at the end of the commandline
+* `End`           Accept and place cursor at the end of the commandline
+* `Ctrl-a`        Accept and place cursor at the start of the commandline
+* `Home`          Accept and place cursor at the start of the commandline
+* `Enter`         Accept and execute the result
+* `Ctrl-j`        Accept and execute the result
+* `Ctrl-f`        Accept and place cursor at the start of the search string
 
-* `Ctrl-b` Accept and execute readline `backward-char` function at the start of the search string
-* `Left` Accept and execute readline `backward-char` function at the start of the search string
-* `Ctrl-f` Accept and execute readline `forward-char` function at the start of the search string
-* `Right` Accept and execute readline `forward-char` function at the start of the search string
-* `Alt-b` Accept and execute readline `backward-word` function at the start of the search string
-* `Alt-f` Accept and execute readline `forward-word` function at the start of the search string
-* `Alt-d` Accept and execute readline `kill-word` function at the start of the search string
+* `Ctrl-b`        Accept and execute readline `backward-char` function at the start of the search string
+* `Left`          Accept and execute readline `backward-char` function at the start of the search string
+* `Ctrl-f`        Accept and execute readline `forward-char` function at the start of the search string
+* `Right`         Accept and execute readline `forward-char` function at the start of the search string
+* `Alt-b`         Accept and execute readline `backward-word` function at the start of the search string
+* `Alt-f`         Accept and execute readline `forward-word` function at the start of the search string
+* `Alt-d`         Accept and execute readline `kill-word` function at the start of the search string
 * `Alt-Backspace` Accept and execute readline `backward-kill-word` function at the start of the search string
-* `Alt-t` Accept and execute readline `transpose-words` function at the start of the search string
-* `Alt-u` Accept and execute readline `upcase-word` function at the start of the search string
-* `Alt-l` Accept and execute readline `downcase-word` function at the start of the search string
-* `Alt-c` Accept and execute readline `capitalize-word` function at the start of the search string
-* `Ctrl-k` Accept and execute readline `kill-line` function at the start of the search string
+* `Alt-t`         Accept and execute readline `transpose-words` function at the start of the search string
+* `Alt-u`         Accept and execute readline `upcase-word` function at the start of the search string
+* `Alt-l`         Accept and execute readline `downcase-word` function at the start of the search string
+* `Alt-c`         Accept and execute readline `capitalize-word` function at the start of the search string
+* `Ctrl-k`        Accept and execute readline `kill-line` function at the start of the search string
 
 #### Modifying the search string
 
-* `Ctrl-h` Delete last character of the search string
-* `Backspace` Delete last character of the search string
-* `Ctrl-w` Delete last word of the search string
-* `Ctrl-u` Delete the whole search string
+* `Ctrl-h`        Delete last character of the search string
+* `Backspace`     Delete last character of the search string
+* `Ctrl-w`        Delete last word of the search string
+* `Ctrl-u`        Delete the whole search string
 
 #### Miscellaneous functions
 
-* `Ctrl-p` Step back one entry in the history
-* `Ctrl-n` Step forward one entry in the history
-* `Ctrl-r` Search backward for the search string
-* `Up` Search backward for the search string
-* `Page-Up` Search backward for the search string
-* `Ctrl-s` Search forward for the search string
-* `Down` Search forward for the search string
-* `Page-Down` Search forward for the search string
-* `Ctrl-l` Clear screen
-* `Ctrl-q` Start subsearch
-* `Ctrl-o` Execute the result and jump to the next history entry
+* `Ctrl-p`        Step back one entry in the history
+* `Ctrl-n`        Step forward one entry in the history
+* `Ctrl-r`        Search backward for the search string
+* `Up`            Search backward for the search string
+* `Page-Up`       Search backward for the search string
+* `Ctrl-s`        Search forward for the search string
+* `Down`          Search forward for the search string
+* `Page-Down`     Search forward for the search string
+* `Ctrl-l`        Clear screen
+* `Ctrl-q`        Start subsearch
+* `Ctrl-o`        Execute the result and jump to the next history entry
 
 ### Customize the prompt
 
