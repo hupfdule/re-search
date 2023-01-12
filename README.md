@@ -77,12 +77,17 @@ Accepting a search can be done with and without navigation / modification.
 
 * `Right` Accept and place cursor at the end of the commandline
 * `Ctrl-e` Accept and place cursor at the end of the commandline
+* `End` Accept and place cursor at the end of the commandline
 * `Ctrl-a` Accept and place cursor at the start of the commandline
+* `Home` Accept and place cursor at the start of the commandline
 * `Enter` Accept and execute the result
 * `Ctrl-j` Accept and execute the result
 * `Ctrl-f` Accept and place cursor at the start of the search string
 
 * `Ctrl-b` Accept and execute readline `backward-char` function at the start of the search string
+* `Left` Accept and execute readline `backward-char` function at the start of the search string
+* `Ctrl-f` Accept and execute readline `forward-char` function at the start of the search string
+* `Right` Accept and execute readline `forward-char` function at the start of the search string
 * `Alt-b` Accept and execute readline `backward-word` function at the start of the search string
 * `Alt-f` Accept and execute readline `forward-word` function at the start of the search string
 * `Alt-d` Accept and execute readline `kill-word` function at the start of the search string

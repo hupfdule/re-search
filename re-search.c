@@ -855,12 +855,21 @@ int main(int argc, char **argv) {
 				action = SEARCH_FORWARD;
 				break;
 			case 52: // end
+				accept(RESULT_EDIT);
+				break;
 			case 67: // right
+				write_readline_position(substring_index);
+				write_readline_function("forward-char");
 				accept(RESULT_EDIT);
 				break;
 			case 49: // home
+				write_readline_function("beginning-of-line");
+				accept(RESULT_EDIT);
+				break;
 			case 68: // left
-				cancel();
+				write_readline_position(substring_index);
+				write_readline_function("backward-char");
+				accept(RESULT_EDIT);
 				break;
 			}
 			break;
@@ -882,6 +891,7 @@ int main(int argc, char **argv) {
 
 		case 6: // C-f
 			write_readline_position(substring_index);
+			write_readline_function("forward-char");
 			accept(RESULT_EDIT);
 			break;
 
