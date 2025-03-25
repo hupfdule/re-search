@@ -30,7 +30,7 @@ make:
 make CFLAGS=-DCHECK_DUPLICATES
 ```
 
-#### Sub-search (experimental)
+#### Sub-search
 
 This feature allows you to do a new search in the current results.
 
