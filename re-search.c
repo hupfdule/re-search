@@ -1091,3 +1091,5 @@ int main(int argc, char **argv) {
 	error("should not happen");
 	cancel();
 }
+
+// vim: tabstop=2 shiftwidth=2 noexpandtab :
