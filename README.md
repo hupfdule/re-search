@@ -118,6 +118,7 @@ Accepting a search can be done with and without navigation / modification.
 * `Ctrl-l`        Clear screen
 * `Ctrl-q`        Start subsearch
 * `Ctrl-x`        Remove last subsearch string
+* `Ctrl-.`        Toggle between positive and negative search
 * `Ctrl-o`        Execute the result and jump to the next history entry
 
 ### Customize the prompt
@@ -205,3 +206,7 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
   at the beginning of the search string in the commandline. This makes it
   easier to spot the search string and to predict the behavior of executing
   readline functions from that position.
+
+- Allow negative searches. Only entries that _do not_ contain the search
+  string will be found then. This is especially handy with subsearches by
+  filtering out unwanted results.
