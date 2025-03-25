@@ -13,7 +13,8 @@ extensions. See [Changes to upstream](#changes-to-upstream) for a list of change
 ### Install
 
 * Compile and add the binary to your PATH.
-* Copy the files `re_search.fish` and `savehist.fish` to the directory `~/.config/fish/functions/`.
+* Copy the file `re_search.fish` to the directory `~/.config/fish/functions/`.
+* Copy the file `savehist.fish` to the directory `~/.config/fish/event_handlers/`.
 * Add the binding to `~/.config/fish/functions/fish_user_key_bindings.fish`:
 ```
 bind \cr re_search
@@ -41,7 +42,7 @@ the following sequence shows how it could help you:
 
 #### Enable bash-like history scrolling
 
-By default fish does not scroll the history buffer on "up" an "C-p", but
+By default fish does not scroll the history buffer on "up" and "C-p", but
 instead executes a search with the current commandline content as search
 string.
 
@@ -62,12 +63,12 @@ to bind it to the "Up" arrow.
 
 #### Cancelling the search
 
-Cancelling the search closes re-search in displays the shell prompt again
+Cancelling the search closes re-search and displays the shell prompt again
 without modification.
 
 * `Ctrl-c`
 * `Ctrl-g`
-* `Ctrl-d` (maybe changed in a the future to some other functionality)
+* `Ctrl-d` (may be changed in a the future to some other functionality)
 * `Left`
 * `Esc`
 
@@ -82,7 +83,6 @@ Accepting a search can be done with and without navigation / modification.
 * `Home`          Accept and place cursor at the start of the commandline
 * `Enter`         Accept and execute the result
 * `Ctrl-j`        Accept and execute the result
-* `Ctrl-f`        Accept and place cursor at the start of the search string
 
 * `Ctrl-b`        Accept and execute readline `backward-char` function at the start of the search string
 * `Left`          Accept and execute readline `backward-char` function at the start of the search string
@@ -117,6 +117,7 @@ Accepting a search can be done with and without navigation / modification.
 * `Page-Down`     Search forward for the search string
 * `Ctrl-l`        Clear screen
 * `Ctrl-q`        Start subsearch
+* `Ctrl-x`        Remove last subsearch string
 * `Ctrl-o`        Execute the result and jump to the next history entry
 
 ### Customize the prompt
@@ -185,7 +186,7 @@ bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
   shell.  
   This is especially important when using `Ctrl-p` for stepping back in
   history as one would expect that those commands are exactly the last
-  commands of the current shell.  
+  commands of the current shell.
 
 - Support Ctrl-o to execute a line from the history and jump to the next
   entry. This replicates the same behavior of Bash. This is still an
