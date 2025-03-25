@@ -81,12 +81,24 @@
 		if (no_of_subsearches > 0) { \
 			fprintf(stderr, "%s", CYAN); \
 			for (int i= 0; i < no_of_subsearches; i++) { \
-				fprintf(stderr, "[%s]", subsearches[i]); \
+				int substr_len = strlen(subsearches[i]); \
+				if (subsearches[i][substr_len-1] == '\1'){ \
+					char negative_term[substr_len-1]; \
+					memcpy(negative_term, subsearches[i], substr_len-1); \
+					negative_term[substr_len-1] = '\0'; \
+					fprintf(stderr, "[%s!%s%s]", RED, CYAN, negative_term); \
+				} else { \
+					fprintf(stderr, "[%s]", subsearches[i]); \
+				} \
 			} \
 			fprintf(stderr, "%s", NORMAL); \
 		} \
 		/* print the action  */ \
 		fprintf(stderr, "%s<%s> ", action_color, action_str); \
+		/* print the negate marker */ \
+		if (negate) { \
+			fprintf(stderr, "%s!%s", RED, CYAN); \
+		} \
 		/* print the search buffer */ \
 		fprintf(stderr, "%s%s", CYAN, buffer); \
 		/* save cursor position */ \
@@ -112,15 +124,17 @@
 			/* restore cursor position */ \
 			fprintf(stderr, "\033[u"); \
 			/* move to found search string */ \
-			if (substring_index > 0) { \
-				fprintf(stderr, "\033[%iC", substring_index); \
+			if (substring_index > -1) { \
+				if (substring_index > 0) { \
+					fprintf(stderr, "\033[%iC", substring_index); \
+				} \
+				/* save cursor position */ \
+				fprintf(stderr, "\033[s"); \
+				/* overwrite search string in different color */ \
+				fprintf(stderr, "%s%s", BLUE, buffer); \
+				/* restore cursor position */ \
+				fprintf(stderr, "\033[u"); \
 			} \
-			/* save cursor position */ \
-			fprintf(stderr, "\033[s"); \
-			/* overwrite search string in different color */ \
-			fprintf(stderr, "%s%s", BLUE, buffer); \
-			/* restore cursor position */ \
-			fprintf(stderr, "\033[u"); \
 		} else { \
 			/* restore cursor position */ \
 			fprintf(stderr, "\033[u"); \
@@ -156,6 +170,7 @@ int search_result_index;
 char subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
 int no_of_subsearches;
 int substring_index;
+int negate;
 FILE *outfile;
 shell_t shell;
 
@@ -560,12 +575,26 @@ void cancel() {
 
 int matches_all_searches(char *history_entry) {
 	for (int i=0; i < no_of_subsearches; i++) {
-		if (!strstr(history_entry, subsearches[i])) {
+		int substr_len = strlen(subsearches[i]);
+		int negative = 0;
+		char negatives[substr_len-1];
+		if (subsearches[i][substr_len-1] == '\1') {
+			// negative substring
+			memcpy(negatives, subsearches[i], substr_len-1);
+			negatives[substr_len-1] = '\0';
+			negative = 1;
+		}
+
+		if (!negative && !strstr(history_entry, subsearches[i])) {
+			return 0;
+		} else if (negative && strstr(history_entry, negatives)) {
 			return 0;
 		}
 	}
 
-	if (strstr(history_entry, buffer)) {
+	if (!negate && strstr(history_entry, buffer)) {
+		return 1;
+	} else if (negate && !strstr(history_entry, buffer)) {
 		return 1;
 	} else {
 		return 0;
@@ -660,6 +689,7 @@ int main(int argc, char **argv) {
 	buffer[0] = '\0';
 	history_size = 0;
 	no_of_subsearches = 0;
+	negate = 0;
 
 	// handle sigint for clean exit
 	signal(SIGINT, cancel);
@@ -751,9 +781,13 @@ int main(int argc, char **argv) {
 					if (matches_all_searches(history[i])) {
 						search_index++;
 						search_result_index = i;
-						char *substring = strstr(history[i], buffer);
-						if (substring) {
-							substring_index = substring - history[i];
+						if (negate) {
+							substring_index = -1;
+						} else {
+							char *substring = strstr(history[i], buffer);
+							if (substring) {
+								substring_index = substring - history[i];
+							}
 						}
 						break;
 					}
@@ -930,6 +964,12 @@ int main(int argc, char **argv) {
 			if (strlen(buffer) == 0)
 				break;
 
+			if (negate) {
+				buffer[buffer_pos] = '\1';
+				buffer[++buffer_pos] = '\0';
+				negate = 0;
+			}
+
 			strcpy(subsearches[no_of_subsearches], buffer);
 			no_of_subsearches++;
 
@@ -940,6 +980,12 @@ int main(int argc, char **argv) {
 			action = SEARCH_BACKWARD;
 			search_result_index = history_size;
 			search_index = 0;
+			break;
+
+		case 46: //C-.    Add negative search term (must not be contained in command)
+			negate = !negate;
+			debug("negate search: %i", negate);
+
 			break;
 
 		case 24: //C-x
