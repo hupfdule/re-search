@@ -908,38 +908,45 @@ int main(int argc, char **argv) {
 			}
 			break;
 
+		// Abort the search
 		case 4: // C-d
 		case 7: // C-g
 			cancel();
 			break;
 
+		// Accept current history entry & place cursor at the end
 		case 5: // C-e
 			accept(RESULT_EDIT);
 			break;
 
+		// Accept current history entry & move cursor 1 char to the left
 		case 2: // C-b
 			write_readline_position(substring_index);
 			write_readline_function("backward-char");
 			accept(RESULT_EDIT);
 			break;
 
+		// Accept current history entry & move cursor 1 char to the right
 		case 6: // C-f
 			write_readline_position(substring_index);
 			write_readline_function("forward-char");
 			accept(RESULT_EDIT);
 			break;
 
+		// Accept current history entry & kill to the end of the line
 		case 11: // C-k
 			write_readline_position(substring_index);
 			write_readline_function("kill-line");
 			accept(RESULT_EDIT);
 			break;
 
+		// Accept current history entry & place cursor at the beginning
 		case 1: // C-a
 			write_readline_function("beginning-of-line");
 			accept(RESULT_EDIT);
 			break;
 
+		// Clear the screen
 		case 12: // C-l
 			// erase line
 			fprintf(stderr, "\033[2J");
@@ -947,19 +954,23 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "\033[1;1H");
 			break;
 
+		// Execute the current history entry
 		case 10: // enter
 		case 13: // new-line
 			accept(RESULT_EXECUTE);
 			break;
 
+		// Search backward
 		case 18: //C-r
 			action = SEARCH_BACKWARD;
 			break;
 
+		// Search forward
 		case 19: //C-s
 			action = SEARCH_FORWARD;
 			break;
 
+		// Add the current search term to the subsearches
 		case 17: //C-q
 			if (strlen(buffer) == 0)
 				break;
@@ -982,12 +993,14 @@ int main(int argc, char **argv) {
 			search_index = 0;
 			break;
 
-		case 46: //C-.    Add negative search term (must not be contained in command)
+		// Negate the search term
+		case 46: //C-.
 			negate = !negate;
 			debug("negate search: %i", negate);
 
 			break;
 
+		// Delete the last subsearch term
 		case 24: //C-x
 			if (no_of_subsearches == 0)
 				break;
@@ -996,6 +1009,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Delete from cursor to beginning of line
 		case 21: // C-u
 			// when scrolling or executing from history end re-search and execute Ctrl-u
 			if (action == SCROLL || action == EXECUTE) {
@@ -1015,6 +1029,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Delete from cursor to beginning of word
 		case 23: // C-w
 			// when scrolling or executing from history end re-search and execute Ctrl-w
 			if (action == SCROLL || action == EXECUTE) {
@@ -1043,6 +1058,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Scroll to previous history entry
 		case 16: // C-p
 			if (search_result_index > 0) {
 				search_result_index--;
@@ -1055,6 +1071,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Scroll to next history entry
 		case 14: // C-n
 			if (search_result_index < history_size) {
 				search_result_index++;
@@ -1067,6 +1084,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Delete previous character
 		case 127: // backspace
 		case 8: // backspace
 			// when scrolling or executing from history end re-search and execute Ctrl-h
@@ -1087,6 +1105,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Execute the search term and jump to the next one
 		case 15: // ctrl-o
 			restore_terminal();
 			char *cmdline = search_result_index < history_size ? history[search_result_index] : buffer;
@@ -1105,6 +1124,7 @@ int main(int argc, char **argv) {
 
 			break;
 
+		// Append a character to the search term
 		default:
 			// ignore the first 32 non-printing characters
 			if (c < 32) {
