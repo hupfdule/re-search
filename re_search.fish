@@ -1,8 +1,8 @@
 function re_search
-	if not [ -e /tmp/my_fish_history_$fish_pid ]
+	if not [ -e /tmp/fish-re-search/my_fish_history_$fish_pid ]
 		savehist
 	end
-	set -x fish_history_file /tmp/my_fish_history_$fish_pid
+	set -x fish_history_file /tmp/fish-re-search/my_fish_history_$fish_pid
 	set -x fish_cursor_pos_file (mktemp -t fish.curs.XXXXXX)
 	set -x fish_readline_cmd_file (mktemp -t fish.rdln.XXXXXX)
 	set -x fish_append_char_file (mktemp -t fish.char.XXXXXX)
@@ -28,3 +28,5 @@ function re_search
 	end
 	rm -f $tmp $fish_cursor_pos_file $fish_readline_cmd_file $fish_append_char_file
 end
+
+# vim: tabstop=2 shiftwidth=2 noexpandtab :
