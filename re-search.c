@@ -125,6 +125,7 @@
 			fprintf(stderr, "\033[u"); \
 			/* move to found search string */ \
 			if (substring_index > -1) { \
+				/* Trying to move the cursor 0 chars moved it 1 char instead. */ \
 				if (substring_index > 0) { \
 					fprintf(stderr, "\033[%iC", substring_index); \
 				} \
