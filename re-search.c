@@ -26,12 +26,26 @@
 #include "config.h"
 #include <sys/wait.h>
 
-#define NORMAL  "\x1B[0m"
-#define RED     "\x1B[31m"
-#define GREEN   "\x1B[32m"
-#define BLUE    "\x1B[1;34m"
-#define CYAN    "\x1B[36m"
-#define BOLD    "\x1B[1m"
+#define RESET         "\x1B[0m"
+#define BOLD          "\x1B[1m"
+#define FAINT         "\x1B[2m"
+#define ITALIC        "\x1B[2m"
+#define UNDERLINE     "\x1B[4m"
+#define NORMAL        "\x1B[22m"
+#define RED           "\x1B[31m"
+#define GREEN         "\x1B[32m"
+#define YELLOW        "\x1B[33m"
+#define BLUE          "\x1B[34m"
+#define MAGENTA       "\x1B[35m"
+#define CYAN          "\x1B[36m"
+#define WHITE         "\x1B[37m"
+#define BRIGHTRED     "\x1B[91m"
+#define BRIGHTGREEN   "\x1B[92m"
+#define BRIGHTYELLOW  "\x1B[93m"
+#define BRIGHTBLUE    "\x1B[94m"
+#define BRIGHTMAGENTA "\x1B[95m"
+#define BRIGHTCYAN    "\x1B[96m"
+#define BRIGHTWHITE   "\x1B[97m"
 
 #define XSTR(A) STR(A)
 #define STR(A) #A
@@ -87,12 +101,12 @@
 					char negative_term[substr_len-1]; \
 					memcpy(negative_term, subsearches[i], substr_len-1); \
 					negative_term[substr_len-1] = '\0'; \
-					fprintf(stderr, "[%s!%s%s]", RED, CYAN, negative_term); \
+					fprintf(stderr, "%s[%s%s!%s%s%s]%s", FAINT, NORMAL, RED, CYAN, negative_term, FAINT, NORMAL); \
 				} else { \
-					fprintf(stderr, "[%s]", subsearches[i]); \
+					fprintf(stderr, "%s[%s%s%s]%s", FAINT, NORMAL, subsearches[i], FAINT, NORMAL); \
 				} \
 			} \
-			fprintf(stderr, "%s", NORMAL); \
+			fprintf(stderr, "%s", RESET); \
 		} \
 		/* print the action  */ \
 		fprintf(stderr, "%s<%s> ", action_color, action_str); \
@@ -101,27 +115,27 @@
 			fprintf(stderr, "%s!%s", RED, CYAN); \
 		} \
 		/* print the search buffer */ \
-		fprintf(stderr, "%s%s", CYAN, buffer); \
+		fprintf(stderr, "%s%s%s%s%s", BOLD, BRIGHTBLUE, buffer, NORMAL, CYAN); \
 		/* save cursor position */ \
 		fprintf(stderr, "\033[s"); \
 		/* if there is a result, append its search index */ \
 		if (index > 0) { \
-			fprintf(stderr, " (%d)", index); \
+			fprintf(stderr, " %s(%s%d%s)%s", FAINT, NORMAL, index, FAINT, NORMAL); \
 		} \
 		if (search_result_index < history_size) { \
 			/* print the current history entry and the maximum history entry */ \
-			fprintf(stderr, " [%lu/%lu]", history_size - search_result_index, history_size); \
+			fprintf(stderr, " %s[%s%lu%s/%s%lu%s]%s", FAINT, NORMAL, history_size - search_result_index, FAINT, NORMAL, history_size, FAINT, NORMAL); \
 		} \
 		if (utf8_strlen(result) > 0) { \
 			/* print the actual result */ \
 			/* print opening bracket */ \
-			fprintf(stderr, " [%s", NORMAL); \
+			fprintf(stderr, " %s[%s", FAINT, RESET); \
 			/* save cursor position */ \
 			fprintf(stderr, "\033[s"); \
 			/* print the actual result commandline */ \
-			fprintf(stderr, "%s%s%s", BOLD, result, NORMAL); \
+			fprintf(stderr, "%s%s%s", BOLD, result, RESET); \
 			/* print closing bracket */ \
-			fprintf(stderr, "%s]", CYAN); \
+			fprintf(stderr, "%s%s]%s", CYAN, FAINT, NORMAL); \
 			/* restore cursor position */ \
 			fprintf(stderr, "\033[u"); \
 			/* move to found search string */ \
@@ -133,7 +147,7 @@
 				/* save cursor position */ \
 				fprintf(stderr, "\033[s"); \
 				/* overwrite search string in different color */ \
-				fprintf(stderr, "%s%s", BLUE, buffer); \
+				fprintf(stderr, "%s%s%s", BOLD, BRIGHTBLUE, buffer); \
 				/* restore cursor position */ \
 				fprintf(stderr, "\033[u"); \
 			} \
@@ -142,7 +156,7 @@
 			fprintf(stderr, "\033[u"); \
 		} \
 		/* restore to normal font */ \
-		fprintf(stderr, "%s", NORMAL); \
+		fprintf(stderr, "%s", RESET); \
 	} while (0)
 #endif /* PROMPT */
 
@@ -592,7 +606,7 @@ void execute(char *cmdline) {
 	if (cpid == 0) {
 		reset_input_mode();
 		// print the line to execute
-		fprintf(stdout, "%s$ %s%s\n", CYAN, cmdline, NORMAL);
+		fprintf(stdout, "%s$ %s%s\n", CYAN, cmdline, RESET);
 		// then execute it
 		execl(getenv("SHELL"), getenv("SHELL"), "-c", cmdline, NULL);
 	}
@@ -602,7 +616,7 @@ void execute(char *cmdline) {
 
 void restore_terminal() {
 	// reset color
-	fprintf(stderr, "%s", NORMAL);
+	fprintf(stderr, "%s", RESET);
 
 	// clear last printed results
 	fprintf(stderr, "\33[2K\r");
