@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -81,7 +82,7 @@
 		if (no_of_subsearches > 0) { \
 			fprintf(stderr, "%s", CYAN); \
 			for (int i= 0; i < no_of_subsearches; i++) { \
-				int substr_len = strlen(subsearches[i]); \
+				int substr_len = utf8_strlen(subsearches[i]); \
 				if (subsearches[i][substr_len-1] == '\1'){ \
 					char negative_term[substr_len-1]; \
 					memcpy(negative_term, subsearches[i], substr_len-1); \
@@ -111,7 +112,7 @@
 			/* print the current history entry and the maximum history entry */ \
 			fprintf(stderr, " [%lu/%lu]", history_size - search_result_index, history_size); \
 		} \
-		if (strlen(result) > 0) { \
+		if (utf8_strlen(result) > 0) { \
 			/* print the actual result */ \
 			/* print opening bracket */ \
 			fprintf(stderr, " [%s", NORMAL); \
@@ -125,7 +126,7 @@
 			fprintf(stderr, "\033[u"); \
 			/* move to found search string */ \
 			if (substring_index > -1) { \
-				/* Trying to move the cursor 0 chars moved it 1 char instead. */ \
+				/* Trying to move the cursor 0 chars moves it 1 char instead. */ \
 				if (substring_index > 0) { \
 					fprintf(stderr, "\033[%iC", substring_index); \
 				} \
@@ -207,6 +208,89 @@ int set_input_mode() {
 	return 0;
 }
 
+
+/**
+ * Returns the number of UTF-8 characters before `substr` starts in `str`.
+ * Returns -1 if `substr` is not found or if `str` ends before `substr` is fully matched.
+ */
+int utf8_chars_until_substr(const char *str, const char *substr) {
+		if (!str || !substr || !*substr) return -1;  // Edge case: empty substring
+
+		const char *pos = str;
+		int char_count = 0;
+
+		while (*pos) {
+				// Check if remaining bytes in `str` can possibly match `substr`
+				const char *temp_pos = pos;
+				const char *temp_sub = substr;
+				bool match = true;
+
+				while (*temp_sub) {
+						if (*temp_sub != *temp_pos || !*temp_pos) {  // Check for str end
+								match = false;
+								break;
+						}
+						temp_sub++;
+						temp_pos++;
+				}
+
+				if (match) {
+						return char_count;
+				}
+
+				// UTF-8 character decoding
+				unsigned char lead_byte = *pos;
+				int bytes_to_skip = 1;	// Default for ASCII or invalid UTF-8
+
+				if ((lead_byte & 0b10000000) == 0b00000000) {				// 1-byte (ASCII)
+						bytes_to_skip = 1;
+				} else if ((lead_byte & 0b11100000) == 0b11000000) { // 2-byte
+						bytes_to_skip = 2;
+				} else if ((lead_byte & 0b11110000) == 0b11100000) { // 3-byte
+						bytes_to_skip = 3;
+				} else if ((lead_byte & 0b11111000) == 0b11110000) { // 4-byte
+						bytes_to_skip = 4;
+				}
+
+				// Ensure we don't skip past the end of the string
+				for (int i = 1; i < bytes_to_skip; i++) {
+						if (pos[i] == '\0') {
+								bytes_to_skip = 1;	// Truncate to avoid overrun
+								break;
+						}
+				}
+
+				pos += bytes_to_skip;
+				char_count++;
+		}
+
+		return -1;	// Substring not found
+}
+
+
+/**
+ * UTF-8 aware strlen().
+ * This implementation does not validate whether the input is actually
+ * valid UTF-8, but assumes it is.
+ */
+int utf8_strlen(const char *str) {
+    int len = 0;
+    if (str == NULL) {
+        return 0;
+    }
+
+    while (*str != '\0') {
+        // Skip continuation bytes (10xxxxxx)
+        if ((*str & 0x11000000) != 0x10000000) {
+            len++;
+        }
+        str++;
+    }
+
+    return len;
+}
+
+
 FILE *try_open_history(const char *local_path, const char *filename) {
 	char path[1152];
 	snprintf(path, sizeof(path), "%s/%s/%s", getenv("HOME"), local_path, filename);
@@ -225,7 +309,7 @@ int append_to_history(const char *cmdline) {
 	}
 
 	// append to history array
-	int len = strlen(cmdline);
+	int len = utf8_strlen(cmdline);
 	history[history_size] = malloc(len + 1);
 	if (!history[history_size]) {
 		error("cannot allocate memory");
@@ -265,7 +349,7 @@ int parse_bash_history_legacy() {
 	while (fgets(cmdline, sizeof(cmdline), fp) != NULL) {
 
 		// skip if truncated
-		len = strlen(cmdline);
+		len = utf8_strlen(cmdline);
 		if (len == 0 || cmdline[len - 1] != '\n')
 			continue;
 		cmdline[--len] = 0; // remove \n
@@ -314,7 +398,7 @@ int parse_bash_history() {
 
 	while (fgets(cmdline, sizeof(cmdline), history_file) != NULL) {
 		// skip if truncated
-		len = strlen(cmdline);
+		len = utf8_strlen(cmdline);
 		if (len == 0 || cmdline[len - 1] != '\n')
 			continue;
 		cmdline[--len] = 0; // remove \n
@@ -375,7 +459,7 @@ int parse_fish_history_legacy() {
 	while (fgets(cmdline, sizeof(cmdline), fp) != NULL) {
 
 		// skip if truncated
-		len = strlen(cmdline);
+		len = utf8_strlen(cmdline);
 		if (len == 0 || cmdline[len - 1] != '\n')
 			continue;
 		cmdline[--len] = 0; // remove \n
@@ -453,7 +537,7 @@ int parse_fish_history() {
 			if (too_long) {
 				too_long = 0;
 				cmdline[len]='\0';
-				debug("commandline is too long (more than %i chars): %s", strlen(cmdline), cmdline);
+				debug("commandline is too long (more than %i bytes): %s", strlen(cmdline), cmdline);
 			} else {
 				cmdline[len]= '\0';
 				if (append_to_history(cmdline)) {
@@ -576,7 +660,7 @@ void cancel() {
 
 int matches_all_searches(char *history_entry) {
 	for (int i=0; i < no_of_subsearches; i++) {
-		int substr_len = strlen(subsearches[i]);
+		int substr_len = utf8_strlen(subsearches[i]);
 		int negative = 0;
 		char negatives[substr_len-1];
 		if (subsearches[i][substr_len-1] == '\1') {
@@ -651,12 +735,12 @@ void write_readline_function(const char *readline_function) {
  * If the environment variable $fish_append_char is not set, it does
  * nothing.
  */
-void write_append_char(const int c) {
+void write_append_char(const char *c) {
 	char *append_char_file = getenv("fish_append_char_file");
 	if (append_char_file != NULL) {
 		FILE *fp= fopen(append_char_file, "w");
 		if (fp != NULL) {
-			fprintf(fp, "%c", c);
+			fprintf(fp, "%s", c);
 			fclose(fp);
 		}
 	}
@@ -672,6 +756,62 @@ void check_shell() {
 		debug("Shell is FISH");
 		shell = FISH;
 	}
+}
+
+
+/**
+ * Return the number of bytes the given char occupies.
+ * For ASCII this should always be 1. But for UTF-8 it
+ * may be up to 4 bytes.
+ * Only the leading byte may be given here!
+ */
+int utf8_bytes(char c) {
+			// Append an UTF-8 character to the search term
+			// UTF-8 has the following structure
+			// 1 Byte:  0xxxxxxx
+			// 2 Bytes: 110xxxxx 10xxxxxx
+			// 3 Bytes: 1110xxxx 10xxxxxx 10xxxxxx
+			// 4 Bytes: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+			if ((c & 0b11111000) == 0b11110000) {
+				return 4;
+			} else if ((c & 0b11110000) == 0b11100000) {
+				return 3;
+			} else if ((c & 0b11100000) == 0b11000000) {
+				return 2;
+			} else {
+				return 1;
+			}
+}
+
+
+/**
+ * Delete the last char of the search string. This method is UTF-8 aware
+ * and deletes as many bytes as necessary for a single unicode char.
+ * On the other hand this implementation is naïve and does not check the
+ * validity of byte sequences. It just assumes that the first bit indicate
+ * whether a byte is part of an UTF-8 char or not.
+ *
+ * @arg 'buffer_pos': The position of the end of the current buffer
+ * @eeturns           The new position of the end of the current buffer
+ */
+int delete_last_char(int buffer_pos) {
+	for (int i= buffer_pos; i >0; i--) {
+		int c = buffer[i-1];
+		if ((c & 0b11000000) == 0b10000000) {
+			// this is byte 2, 3 or 4 of a UTF-8 multi-byte char
+			// therefore we need to delete at least one more byte
+			continue;
+		} else {
+			buffer_pos = i-1;
+      buffer[buffer_pos] = '\0';
+			return buffer_pos;
+		}
+	}
+
+	// if we get this far, we deleted the last character
+	buffer_pos = 0;
+	buffer[buffer_pos] = '\0';
+	return buffer_pos;
 }
 
 
@@ -737,10 +877,10 @@ int main(int argc, char **argv) {
 
 	// if the buffer environment variable is set, populate the input buffer
 	char* env_buffer = getenv("SEARCH_BUFFER");
-	if (env_buffer && strlen(env_buffer) > 0) {
+	if (env_buffer && utf8_strlen(env_buffer) > 0) {
 		strncpy(buffer, env_buffer, sizeof(buffer) - 1);
 		buffer[sizeof(buffer) - 1] = '\0';
-		buffer_pos = strlen(buffer);
+		buffer_pos = utf8_strlen(buffer);
 
 		// remove trailing '\n'
 		if (buffer[buffer_pos - 1] == '\n')
@@ -750,7 +890,7 @@ int main(int argc, char **argv) {
 	// if the start index environment variable is set, jump to the
 	// corresponding history entry
 	char* start_index = getenv("START_INDEX");
-	if (start_index && strlen(start_index) > 0) {
+	if (start_index && utf8_strlen(start_index) > 0) {
 		int idx= strtol(start_index, NULL, 10);
 		search_result_index = history_size - idx;
 		action = SCROLL;
@@ -768,7 +908,7 @@ int main(int argc, char **argv) {
 		// place cursor at end of current history item (if there is one)
 		// in case a search string is entered it will be repositioned later
 		if (search_result_index < history_size) {
-			substring_index = strlen(history[search_result_index]);
+			substring_index = utf8_strlen(history[search_result_index]);
 		} else {
 			substring_index = 0;
 		}
@@ -787,7 +927,7 @@ int main(int argc, char **argv) {
 						} else {
 							char *substring = strstr(history[i], buffer);
 							if (substring) {
-								substring_index = substring - history[i];
+								substring_index = utf8_chars_until_substr(history[i], buffer);
 							}
 						}
 						break;
@@ -800,7 +940,7 @@ int main(int argc, char **argv) {
 						search_result_index = i;
 						char *substring = strstr(history[i], buffer);
 						if (substring) {
-							substring_index = substring - history[i];
+							substring_index = utf8_chars_until_substr(history[i], buffer);
 						}
 						break;
 					}
@@ -973,7 +1113,7 @@ int main(int argc, char **argv) {
 
 		// Add the current search term to the subsearches
 		case 17: //C-q
-			if (strlen(buffer) == 0)
+			if (utf8_strlen(buffer) == 0)
 				break;
 
 			if (negate) {
@@ -1096,8 +1236,7 @@ int main(int argc, char **argv) {
 			}
 
 			// otherwise delete last word of search
-			if (buffer_pos > 0)
-				buffer[--buffer_pos] = '\0';
+      buffer_pos = delete_last_char(buffer_pos);
 
 			// reset search
 			action = SEARCH_BACKWARD;
@@ -1128,25 +1267,47 @@ int main(int argc, char **argv) {
 		// Append a character to the search term
 		default:
 			// ignore the first 32 non-printing characters
-			if (c < 32) {
+			if (c >= 0 && c < 32) {
 				noop = 1;
 				break;
 			}
 
+			int remaining_bytes = utf8_bytes(c) - 1;
+
 			// prevent buffer overflow
-			if (buffer_pos >= MAX_INPUT_LEN - 1)
+			if (buffer_pos + remaining_bytes >= MAX_INPUT_LEN - 1)
 				continue;
+
+			buffer[buffer_pos] = c;
+			buffer[++buffer_pos] = '\0';
+
+			for (int i = 0; i < remaining_bytes; i++) {
+				debug("Multibyte UTF-8 char. We need to read more bytes");
+			  c = getchar();
+				debug("Continuation byte: %i", c);
+				if (c == EOF) {
+					debug("Invalid UTF-8 continuation byte");
+					continue;
+				}
+
+				// Check validity of the continuation byte (10xxxxxx)
+				if ((c & 0b11000000) != 0b10000000) {
+					debug("Invalid UTF-8 continuation byte");
+					continue;
+				}
+
+				buffer[buffer_pos] = c;
+				buffer[++buffer_pos] = '\0';
+			}
 
 			// entering a printable character while scrolling ends the scrolling
 			// and appends the new character
 			if (action == SCROLL) {
-				write_append_char(c);
+				const char *utf8_char = buffer + buffer_pos - remaining_bytes - 1;
+				write_append_char(utf8_char);
 				accept(RESULT_EDIT);
 				break;
 			}
-
-			buffer[buffer_pos] = c;
-			buffer[++buffer_pos] = '\0';
 
 			// reset search
 			action = SEARCH_BACKWARD;
