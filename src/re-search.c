@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "config.h"
+#include "version.h"
 #include <sys/wait.h>
 
 #define RESET         "\x1B[0m"
@@ -190,6 +191,10 @@ int negate;
 FILE *outfile;
 shell_t shell;
 
+
+void print_version() {
+		fprintf(stdout, "re-search version %s\n", VERSION);
+}
 
 void reset_input_mode() {
 	debug("restore terminal settings");
@@ -834,9 +839,14 @@ int main(int argc, char **argv) {
 	if (argc == 1) {
 		outfile = stdout;
 	} else if (argc == 2) {
-		outfile = fopen(argv[1], "w");
+    if (strcmp(argv[1], "--version") == 0) {
+			print_version();
+			return 0;
+		} else {
+		  outfile = fopen(argv[1], "w");
+		}
 	} else {
-		error("The only (optional) valid parameter is the path to the file to write the result to.");
+		error("The only (optional) valid parameter is the path to the file to write the result to or the option --version.");
 		return 1;
 	}
 
