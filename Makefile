@@ -1,14 +1,17 @@
-CC=cc
-CFLAGS=-Wall -O2
+CC     = cc
+CFLAGS = -Wall -O2
 
-debug: CFLAGS=-DDEBUG -g -Wall
+
+all: re-search re-search-static
 
 re-search: re-search.c
 	$(CC) $(CFLAGS) $^ -o $@
 
+re-search-static: re-search.c
+	$(CC) $(CFLAGS) -static $^ -o $@
+
+debug: CFLAGS += -DDEBUG -g
 debug: re-search
 
-all: re-search
-
 clean:
-	rm -f re-search
+	rm -f re-search re-search-static
