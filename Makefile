@@ -1,17 +1,23 @@
-CC     = cc
-CFLAGS = -Wall -O2
+CC      = cc
+CFLAGS  = -Wall -O2
+BIN_DIR = bin
+SOURCES = src/re-search.c
+HEADERS = src/config.h src/version.h
 
+.PHONY: all debug clean
 
-all: re-search re-search-static
+all: $(BIN_DIR)/re-search $(BIN_DIR)/re-search-static
 
-re-search: re-search.c
-	$(CC) $(CFLAGS) $^ -o $@
+$(BIN_DIR)/re-search: $(SOURCES) $(HEADERS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $< -o $@
 
-re-search-static: re-search.c
-	$(CC) $(CFLAGS) -static $^ -o $@
+$(BIN_DIR)/re-search-static: $(SOURCES) $(HEADERS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -static $< -o $@
 
 debug: CFLAGS += -DDEBUG -g
-debug: re-search
+debug: $(BIN_DIR)/re-search
 
 clean:
-	rm -f re-search re-search-static
+	rm -rf $(BIN_DIR)
