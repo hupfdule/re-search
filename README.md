@@ -118,7 +118,7 @@ Accepting a search can be done with and without navigation / modification.
 * `Ctrl-l`        Clear screen
 * `Ctrl-q`        Start subsearch
 * `Ctrl-x`        Remove last subsearch string
-* `Ctrl-.`        Toggle between positive and negative search
+* `Ctrl-z`        Toggle between positive and negative search
 * `Ctrl-o`        Execute the result and jump to the next history entry
 
 ### Customize the prompt

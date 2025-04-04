@@ -1140,7 +1140,7 @@ int main(int argc, char **argv) {
 			break;
 
 		// Negate the search term
-		case 46: //C-.
+		case 26: //C-z
 			negate = !negate;
 			debug("negate search: %i", negate);
 
