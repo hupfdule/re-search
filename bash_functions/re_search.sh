@@ -33,14 +33,13 @@ re_search() {
   [ -s "$tmp" ] || return 1
   READLINE_LINE="$(cat "$tmp")"
   READLINE_POINT=${#READLINE_LINE}
-  rm -f "$tmp"
+  ## Here we could execute the readline command in $re_search_readline_cmd_file and
+  ## append the character specified in $re_search_append_char_file.
+  ## But it seems Bash doesn’t support this use case…
+  rm -f "$tmp" "$re_search_cursor_pos_file" "$re_search_readline_cmd_file" "$re_search_append_char_file"
   return $res
 }
+
 ## Beware! This requires xdotool to work. And this will only work under X.
 bind -x '"\C-r":"if re_search; then xdotool key KP_Enter; fi"'
-## Here we could place the cursor to the position specified in $re_search_cursr_pos_file,
-## then execute the readline command in $re_search_readline_cmd_file and append the character
-## specified in $re_search_append_char_file. Afterwards we can delete these files.
-## But it seems Bash doesn’t support this use case…
-rm -f "$tmp" "$re_search_cursr_pos_file" "$re_search_readline_cmd_file" "$re_search_append_char_file"
 
