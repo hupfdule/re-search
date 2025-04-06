@@ -707,9 +707,9 @@ int matches_all_searches(char *history_entry) {
 
 /**
  * Writes the specified in to the file denoted by
- * $fish_cursor_pos_file. But only if it is >= 0.
+ * $re_search_cursor_pos_file. But only if it is >= 0.
  *
- * If the environment variable $fish_cursor_pos_file is not set, it does
+ * If the environment variable $re_search_cursor_pos_file is not set, it does
  * nothing.
  */
 void write_readline_position(const int readline_position) {
@@ -717,7 +717,7 @@ void write_readline_position(const int readline_position) {
 		return;
 	}
 
-	char *readline_pos_file = getenv("fish_cursor_pos_file");
+	char *readline_pos_file = getenv("re_search_cursor_pos_file");
 	if (readline_pos_file != NULL) {
 		FILE *fp= fopen(readline_pos_file, "w");
 		if (fp != NULL) {
@@ -729,14 +729,14 @@ void write_readline_position(const int readline_position) {
 
 /**
  * Writes the specified string to the file denoted by
- * $fish_readline_cmd_file. The string should be a valid readline movement
+ * $re_search_readline_cmd_file. The string should be a valid readline movement
  * function name that can be correctly interpreted by fish.
  *
- * If the environment variable $fish_readline_cmd_file is not set, it does
+ * If the environment variable $re_search_readline_cmd_file is not set, it does
  * nothing.
  */
 void write_readline_function(const char *readline_function) {
-	char *readline_function_file = getenv("fish_readline_cmd_file");
+	char *readline_function_file = getenv("re_search_readline_cmd_file");
 	if (readline_function_file != NULL) {
 		FILE *fp= fopen(readline_function_file, "w");
 		if (fp != NULL) {
@@ -749,13 +749,13 @@ void write_readline_function(const char *readline_function) {
 
 /**
  * Writes the specified char to the file denoted by
- * $fish_append_char_file.
+ * $re_search_append_char_file.
  *
  * If the environment variable $fish_append_char is not set, it does
  * nothing.
  */
 void write_append_char(const char *c) {
-	char *append_char_file = getenv("fish_append_char_file");
+	char *append_char_file = getenv("re_search_append_char_file");
 	if (append_char_file != NULL) {
 		FILE *fp= fopen(append_char_file, "w");
 		if (fp != NULL) {

@@ -3,10 +3,10 @@ function re_search
 	if not [ -e $fish_history_file ]
 		re_search_savehist
 	end
-	set -x fish_cursor_pos_file (mktemp -t fish.curs.XXXXXX)
-	set -x fish_readline_cmd_file (mktemp -t fish.rdln.XXXXXX)
-	set -x fish_append_char_file (mktemp -t fish.char.XXXXXX)
-	set -l tmp (mktemp -t fish.XXXXXX)
+	set -x re_search_cursor_pos_file (mktemp -t re_search_curs.XXXXXX)
+	set -x re_search_readline_cmd_file (mktemp -t re_search_rdln.XXXXXX)
+	set -x re_search_append_char_file (mktemp -t re_search_char.XXXXXX)
+	set -l tmp (mktemp -t fish.re-search.XXXXXX)
 	set -x SEARCH_BUFFER (commandline -b)
 	re-search $tmp
 	set -l res $status
@@ -14,19 +14,19 @@ function re_search
 	if [ -s $tmp ]
 		commandline -r (cat $tmp)
 	end
-	if [ -s $fish_cursor_pos_file ]
-		commandline -C (cat $fish_cursor_pos_file)
+	if [ -s $re_search_cursor_pos_file ]
+		commandline -C (cat $re_search_cursor_pos_file)
 	end
-	if [ -s $fish_readline_cmd_file ]
-		commandline -f (cat $fish_readline_cmd_file)
+	if [ -s $re_search_readline_cmd_file ]
+		commandline -f (cat $re_search_readline_cmd_file)
 	end
-	if [ -s $fish_append_char_file ]
-		commandline -i (cat $fish_append_char_file)
+	if [ -s $re_search_append_char_file ]
+		commandline -i (cat $re_search_append_char_file)
 	end
 	if [ $res = 0 ]
 		commandline -f execute
 	end
-	rm -f $tmp $fish_cursor_pos_file $fish_readline_cmd_file $fish_append_char_file
+	rm -f $tmp $re_search_cursor_pos_file $re_search_readline_cmd_file $re_search_append_char_file
 end
 
 # vim: tabstop=2 shiftwidth=2 noexpandtab :
