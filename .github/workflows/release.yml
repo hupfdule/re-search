@@ -1,0 +1,70 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            dockcross_image: dockcross/linux-x64
+          - arch: i386
+            dockcross_image: dockcross/linux-x86
+          - arch: aarch64
+            dockcross_image: dockcross/linux-arm64
+          - arch: armv7
+            dockcross_image: dockcross/linux-armv7
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and package
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work \
+            ${{ matrix.dockcross_image }} \
+            /bin/sh -c "make all && make package"
+
+      - name: Rename artifacts
+        run: |
+          for f in re-search-*.tar.gz; do
+            new_name="${f%.tar.gz}-${{ matrix.arch }}.tar.gz"
+            mv "$f" "$new_name"
+          done
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.arch }}
+          path: |
+            re-search-*-${{ matrix.arch }}.tar.gz
+            re-search-static-*-${{ matrix.arch }}.tar.gz
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create releases
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v4
+        with:
+          path: packages
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ needs.build.outputs.tag_message }}
+          files: |
+            packages/**/*
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
