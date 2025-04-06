@@ -1,5 +1,5 @@
 function re_search
-	set -x fish_history_file /tmp/re-search_fish_history_"$USER"_"$fish"_pid
+	set -x fish_history_file /tmp/re-search_fish_history_"$USER"_"$fish_pid"
 	if not [ -e $fish_history_file ]
 		savehist
 	end
