@@ -12,6 +12,7 @@ ARCH=$(dpkg --print-architecture)
 # Directories
 BIN_DIR="bin"
 DIST_DIR="dist"
+BASH_FUNC_DIR="bash_functions"
 FISH_FUNC_DIR="fish_functions"
 FISH_CONF_DIR="fish_config"
 TMP_DIR=$(mktemp -d)
@@ -31,14 +32,14 @@ package_binary() {
     mkdir -p "${TMP_DIR}/bin"
     mkdir -p "${TMP_DIR}/share/fish/vendor_functions.d"
     mkdir -p "${TMP_DIR}/share/doc/re-search"
+    mkdir -p "${TMP_DIR}/share/doc/re-search/examples/"
 
     cp "${BIN_DIR}/${binary_name}" "${TMP_DIR}/bin/re-search"
     cp "README.md"                 "${TMP_DIR}/share/doc/re-search/"
     cp "LICENSE"                   "${TMP_DIR}/share/doc/re-search/"
 
-    if [ -d "$FISH_FUNC_DIR" ]; then
-        cp -R "${FISH_FUNC_DIR}/"* "${TMP_DIR}/share/fish/vendor_functions.d/"
-    fi
+    cp -R "${FISH_FUNC_DIR}/"*     "${TMP_DIR}/share/fish/vendor_functions.d/"
+    cp -R "${BASH_FUNC_DIR}"       "${TMP_DIR}/share/doc/re-search/examples/"
 
     mkdir -p "${DIST_DIR}"
     tar czf "${DIST_DIR}/$output_file" -C "$TMP_DIR" bin share
@@ -59,16 +60,19 @@ package_deb() {
     mkdir -p "${DEB_DIR}/usr/share/fish/vendor_functions.d"
     mkdir -p "${DEB_DIR}/usr/share/fish/vendor_conf.d"
     mkdir -p "${DEB_DIR}/usr/share/doc/re-search"
+    mkdir -p "${DEB_DIR}/usr/share/doc/re-search/examples"
 
     cp "debian/control"            "${DEB_DIR}/DEBIAN"
     cp "${BIN_DIR}/${binary_name}" "${DEB_DIR}/usr/bin/re-search"
     cp "README.md"                 "${DEB_DIR}/usr/share/doc/re-search/"
     cp "LICENSE"                   "${DEB_DIR}/usr/share/doc/re-search/"
 
-    cp -R "${FISH_FUNC_DIR}/"* "${DEB_DIR}/usr/share/fish/vendor_functions.d/"
-    cp -R "${FISH_CONF_DIR}/"* "${DEB_DIR}/usr/share/fish/vendor_conf.d/"
+    cp -R "${FISH_FUNC_DIR}/"*     "${DEB_DIR}/usr/share/fish/vendor_functions.d/"
+    cp -R "${FISH_CONF_DIR}/"*     "${DEB_DIR}/usr/share/fish/vendor_conf.d/"
 
-    sed -i "s/^Version: .*$/Version: ${VERSION}/" "${DEB_DIR}/DEBIAN/control"
+    cp -R "${BASH_FUNC_DIR}/"      "${DEB_DIR}/usr/share/doc/re-search/examples/"
+
+    sed -i "s/^Version: .*$/Version: ${VERSION}/"        "${DEB_DIR}/DEBIAN/control"
     sed -i "s/^Architecture: .*$/Architecture: ${ARCH}/" "${DEB_DIR}/DEBIAN/control"
 
     mkdir -p "${DIST_DIR}"
