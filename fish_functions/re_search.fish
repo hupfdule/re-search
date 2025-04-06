@@ -1,7 +1,7 @@
 function re_search
 	set -x fish_history_file /tmp/re-search_fish_history_"$USER"_"$fish_pid"
 	if not [ -e $fish_history_file ]
-		savehist
+		re_search_savehist
 	end
 	set -x fish_cursor_pos_file (mktemp -t fish.curs.XXXXXX)
 	set -x fish_readline_cmd_file (mktemp -t fish.rdln.XXXXXX)

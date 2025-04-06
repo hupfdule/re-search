@@ -1,4 +1,4 @@
-function savehist --on-event fish_postexec
+function re_search_savehist --on-event fish_postexec
 	set -x fish_pid_history_file /tmp/re-search_fish_history_"$USER"_"$fish_pid"
 	if not [ -f $fish_pid_history_file ]
 		history --null --reverse > $fish_pid_history_file
