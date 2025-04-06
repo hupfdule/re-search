@@ -1,0 +1,18 @@
+Package: re-search
+Version: 0.0.1
+Section: shells
+Priority: optional
+Architecture: amd64
+Multi-Arch: foreign
+Recommends: fish
+Maintainer: Marco Herrn <marco@mherrn.de>
+Homepage: https://github.com/hupfdule/re-search
+Description: A more sophisticated history search for the Fish Shell
+ re-search is a tool and accompanying shell scripts for providing an advanced
+ history search for the Fish Shell.
+ .
+ re-search can be used with Bash as well, but only with some restrictions. The
+ search too itself fully works, but it is only able to fill the matching command
+ line into the current prompt. For executing the prompt (or even navigating to
+ the cursor position from inside re-search) would only be possible via
+ additional external tool (which this package doesn’t provide).
