@@ -10,6 +10,7 @@ re_search() {
   tmp=$(mktemp -t bash-re-search.XXXXXX)
   export SEARCH_BUFFER="$READLINE_LINE"
   stty -ixon
+  stty susp undef # allow us to use ctrl-z in re-search
   RE_SEARCH_SHELL=BASH re-search "$tmp"
   res="$?"
   echo "$res"
