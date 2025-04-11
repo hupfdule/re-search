@@ -1108,6 +1108,7 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "\033[2J");
 			// jump to upper left corner
 			fprintf(stderr, "\033[1;1H");
+			noop = 1;
 			break;
 
 		// Execute the current history entry
