@@ -1,6 +1,7 @@
 #!/bin/bash
 re_search_savehist() {
-  bash_history_file="/tmp/re-search_bash_history_${USER}_${BASHPID}"
+  mkdir -p /tmp/re-search/
+  bash_history_file="/tmp/re-search/bash_history_${USER}_${BASHPID}"
   ## Delete the history file on shell exit
   trap "rm -rf ${bash_history_file}" EXIT
 
@@ -16,14 +17,14 @@ re_search_savehist() {
 export PROMPT_COMMAND='if [ "$(id -u)" -ne 0 ]; then re_search_savehist; fi'
 
 re_search() {
-  export bash_history_file="/tmp/re-search_bash_history_${USER}_${BASHPID}"
+  export bash_history_file="/tmp/re-search/bash_history_${USER}_${BASHPID}"
   if [ ! -e "$bash_history_file" ]; then
     re_search_savehist
   fi
-  export re_search_cursor_pos_file=$(mktemp -t re_search_curs.XXXXXX)
-  export re_search_readline_cmd_file=$(mktemp -t re_search_rdln.XXXXXX)
-  export re_search_append_char_file=$(mktemp -t re_search_char.XXXXXX)
-  tmp=$(mktemp -t bash-re-search.XXXXXX)
+  export re_search_cursor_pos_file=$(mktemp -t /tmp/re-search/re_search_curs.XXXXXX)
+  export re_search_readline_cmd_file=$(mktemp -t /tmp/re-search/re_search_rdln.XXXXXX)
+  export re_search_append_char_file=$(mktemp -t /tmp/re-search/re_search_char.XXXXXX)
+  tmp=$(mktemp -t /tmp/re-search/bash-re-search.XXXXXX)
   export SEARCH_BUFFER="$READLINE_LINE"
   stty -ixon
   stty susp undef # allow us to use ctrl-z in re-search
