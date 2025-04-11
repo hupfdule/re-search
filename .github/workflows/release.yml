@@ -27,14 +27,19 @@ jobs:
 
       - name: Build and package
         run: |
-          docker run --rm -v "$PWD:/work" -w /work \
+          docker run --rm -v "$PWD:/work" -w /work --user $(id -u):$(id -g) \
             ${{ matrix.dockcross_image }} \
             /bin/sh -c "make all && make package"
 
       - name: Rename artifacts
         run: |
+          cd dist
           for f in re-search-*.tar.gz; do
             new_name="${f%.tar.gz}-${{ matrix.arch }}.tar.gz"
+            mv "$f" "$new_name"
+          done
+          for f in re-search*.deb; do
+            new_name="${f%.deb}-${{ matrix.arch }}.deb"
             mv "$f" "$new_name"
           done
 
@@ -43,8 +48,9 @@ jobs:
         with:
           name: packages-${{ matrix.arch }}
           path: |
-            re-search-*-${{ matrix.arch }}.tar.gz
-            re-search-static-*-${{ matrix.arch }}.tar.gz
+            dist/re-search-*-${{ matrix.arch }}.tar.gz
+            dist/re-search-static-*-${{ matrix.arch }}.tar.gz
+            dist/re-search*-${{ matrix.arch }}.deb
 
   create-release:
     needs: build

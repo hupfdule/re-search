@@ -28,4 +28,4 @@ re-search
 .cproject
 
 # Users customizations
-config.h
+#config.h
