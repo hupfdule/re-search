@@ -75,11 +75,11 @@
 		switch (action) { \
 			case SEARCH_BACKWARD: \
 				action_str = "backward"; \
-				action_color = search_index > 0 ? GREEN : RED; \
+				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
 			case SEARCH_FORWARD: \
 				action_str = "forward"; \
-				action_color = search_index > 0 ? GREEN : RED; \
+				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
 			case SCROLL: \
 				action_str = ""; \
@@ -184,6 +184,7 @@ char *history[MAX_HISTORY_SIZE];
 char buffer[MAX_INPUT_LEN];
 unsigned long history_size;
 int search_result_index;
+bool search_succeeded;
 char subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
 int no_of_subsearches;
 int substring_index;
@@ -929,12 +930,14 @@ int main(int argc, char **argv) {
 
 	int noop = 0;
 	while (1) {
+		search_succeeded = false;
 		if (!noop && (buffer_pos > 0 || no_of_subsearches > 0)) {
 			// search in the history array
 			// TODO: factorize?
 			if (action == SEARCH_BACKWARD) {
 				for (i = search_result_index - 1; i >= 0; i--) {
 					if (matches_all_searches(history[i])) {
+						search_succeeded = true;
 						search_index++;
 						search_result_index = i;
 						if (negate) {
@@ -951,6 +954,7 @@ int main(int argc, char **argv) {
 			} else {
 				for (i = search_result_index + 1; i < history_size; i++) {
 					if (matches_all_searches(history[i])) {
+						search_succeeded = true;
 						search_index--;
 						search_result_index = i;
 						char *substring = strstr(history[i], buffer);
