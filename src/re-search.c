@@ -188,7 +188,7 @@ bool search_succeeded;
 char subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
 int no_of_subsearches;
 int substring_index;
-int negate;
+bool negate;
 FILE *outfile;
 shell_t shell;
 
@@ -544,18 +544,18 @@ int parse_fish_history() {
 	char cmdline[MAX_LINE_LEN];
 	int ch;
 	int len= 0;
-	int too_long= 0; // set to 1 if a commandline from the history is longer than MAX_LINE_LEN
+	bool too_long= false; // set to 1 if a commandline from the history is longer than MAX_LINE_LEN
 
 	while((ch=fgetc(history_file)) != EOF) {
 		if (len >= MAX_LINE_LEN - 1 && !too_long) {
-			too_long= 1;
+			too_long= true;
 			len++;
 			continue;
 		}
 
 		if (ch == '\0') {
 			if (too_long) {
-				too_long = 0;
+				too_long = false;
 				cmdline[len]='\0';
 				debug("commandline is too long (more than %i bytes): %s", strlen(cmdline), cmdline);
 			} else {
@@ -580,16 +580,17 @@ int parse_fish_history() {
  * Remove duplicate entries from the already parsed history.
  */
 void remove_duplicates() {
-	int i,j,k,dup;
+	int i,j,k;
+	bool dup
 
 	// check for duplicates, it is easier to do it afterward to preserve
 	// history order
 	k = 0;
 	for (i = 0 ; i < history_size ; i++) {
-		dup = 0;
+		dup = false;
 		for (j = i + 1 ; j < history_size ; j++) {
 			if (!strcmp(history[i], history[j])) {
-				dup = 1;
+				dup = true;
 				break;
 			}
 		}
@@ -855,7 +856,7 @@ int main(int argc, char **argv) {
 	buffer[0] = '\0';
 	history_size = 0;
 	no_of_subsearches = 0;
-	negate = 0;
+	negate = false;
 
 	// handle sigint for clean exit
 	signal(SIGINT, cancel);
@@ -928,7 +929,7 @@ int main(int argc, char **argv) {
 	// disable line wrapping
 	fprintf(stderr, "\033[?7l");
 
-	int noop = 0;
+	bool noop = false;
 	while (1) {
 		search_succeeded = false;
 		if (!noop && (buffer_pos > 0 || no_of_subsearches > 0)) {
@@ -966,7 +967,7 @@ int main(int argc, char **argv) {
 				}
 			}
 		}
-		noop = 0;
+		noop = false;
 
 		// erase line
 		fprintf(stderr, "\033[2K\r");
@@ -1112,7 +1113,7 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "\033[2J");
 			// jump to upper left corner
 			fprintf(stderr, "\033[1;1H");
-			noop = 1;
+			noop = true;
 			break;
 
 		// Execute the current history entry
@@ -1139,7 +1140,7 @@ int main(int argc, char **argv) {
 			if (negate) {
 				buffer[buffer_pos] = '\1';
 				buffer[++buffer_pos] = '\0';
-				negate = 0;
+				negate = false;
 			}
 
 			strcpy(subsearches[no_of_subsearches], buffer);
@@ -1288,7 +1289,7 @@ int main(int argc, char **argv) {
 		default:
 			// ignore the first 32 non-printing characters
 			if (c >= 0 && c < 32) {
-				noop = 1;
+				noop = true;
 				break;
 			}
 
