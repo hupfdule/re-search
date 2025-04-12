@@ -87,7 +87,7 @@
 				break; \
 			case EXECUTE: \
 				action_str= "execute"; \
-				action_color = CYAN; \
+				action_color = GREEN; \
 				break; \
 			default: \
 				action_str = "??"; \
