@@ -587,18 +587,19 @@ void remove_duplicates() {
 	// history order
 	k = 0;
 	for (i = 0 ; i < history_size ; i++) {
+		char *history_entry= history[i];
 		dup = false;
 		for (j = i + 1 ; j < history_size ; j++) {
-			if (!strcmp(history[i], history[j])) {
+			if (!strcmp(history_entry, history[j])) {
 				dup = true;
 				break;
 			}
 		}
 		if (dup) {
-			free(history[i]);
+			free(history_entry);
 		} else {
 			if (i != k)
-				history[k] = history[i];
+				history[k] = history_entry;
 			k++;
 		}
 	}
@@ -937,30 +938,32 @@ int main(int argc, char **argv) {
 			// TODO: factorize?
 			if (action == SEARCH_BACKWARD) {
 				for (i = search_result_index - 1; i >= 0; i--) {
-					if (matches_all_searches(history[i])) {
+					char *current_entry= history[i];
+					if (matches_all_searches(current_entry)) {
 						search_succeeded = true;
 						search_index++;
 						search_result_index = i;
 						if (negate) {
 							substring_index = -1;
 						} else {
-							char *substring = strstr(history[i], buffer);
+							char *substring = strstr(current_entry, buffer);
 							if (substring) {
-								substring_index = utf8_chars_until_substr(history[i], buffer);
+								substring_index = utf8_chars_until_substr(current_entry, buffer);
 							}
 						}
 						break;
 					}
 				}
-			} else {
+			} else if (action == SEARCH_FORWARD) {
 				for (i = search_result_index + 1; i < history_size; i++) {
-					if (matches_all_searches(history[i])) {
+					char *current_entry= history[i];
+					if (matches_all_searches(current_entry)) {
 						search_succeeded = true;
 						search_index--;
 						search_result_index = i;
-						char *substring = strstr(history[i], buffer);
+						char *substring = strstr(current_entry, buffer);
 						if (substring) {
-							substring_index = utf8_chars_until_substr(history[i], buffer);
+							substring_index = utf8_chars_until_substr(current_entry, buffer);
 						}
 						break;
 					}
