@@ -960,9 +960,13 @@ int main(int argc, char **argv) {
 						search_succeeded = true;
 						search_index--;
 						search_result_index = i;
-						char *substring = strstr(current_entry, buffer);
-						if (substring) {
-							substring_index = utf8_chars_until_substr(current_entry, buffer);
+						if (negate) {
+							substring_index = -1;
+						} else {
+							char *substring = strstr(current_entry, buffer);
+							if (substring) {
+								substring_index = utf8_chars_until_substr(current_entry, buffer);
+							}
 						}
 						break;
 					}
