@@ -935,7 +935,6 @@ int main(int argc, char **argv) {
 		search_succeeded = false;
 		if (!noop && (buffer_pos > 0 || no_of_subsearches > 0)) {
 			// search in the history array
-			// TODO: factorize?
 			if (action == SEARCH_BACKWARD) {
 				for (i = search_result_index - 1; i >= 0; i--) {
 					char *current_entry= history[i];
