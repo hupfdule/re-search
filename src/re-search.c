@@ -179,18 +179,18 @@ typedef enum {
 	FISH, BASH,
 } shell_t;
 
-struct termios saved_attributes;
-char *history[MAX_HISTORY_SIZE];
-char buffer[MAX_INPUT_LEN];
+struct        termios saved_attributes;
+char         *history[MAX_HISTORY_SIZE];
+char          buffer[MAX_INPUT_LEN];
 unsigned long history_size;
-int search_result_index;
-bool search_succeeded;
-char subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
-int no_of_subsearches;
-int substring_index;
-bool negate;
-FILE *outfile;
-shell_t shell;
+int           search_result_index;
+bool          search_succeeded;
+char          subsearches[MAX_SUBSEARCHES][MAX_INPUT_LEN];
+int           no_of_subsearches;
+int           substring_index;
+bool          negate;
+FILE         *outfile;
+shell_t       shell;
 
 
 void print_version() {
