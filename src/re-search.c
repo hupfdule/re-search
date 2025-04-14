@@ -82,9 +82,12 @@
 				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
 			case SCROLL_BACK: \
+				action_str = "↑"; \
+				action_color = GREEN; \
+			  break; \
 			case SCROLL_FORTH: \
-				action_str = ""; \
-				action_color = CYAN; \
+				action_str = "↓"; \
+				action_color = GREEN; \
 				break; \
 			case EXECUTE: \
 				action_str= "execute"; \
@@ -939,6 +942,13 @@ int main(int argc, char **argv) {
 		char *matching_entry = NULL;
 
 		if (!noop && (buffer_pos > 0 || no_of_subsearches > 0)) {
+			// We need to remember whether the current history item matches the
+			// search string. This is necessary for correctly decreasing the
+			// search_index only if step away from a maching history entry.
+			bool matches_current  = search_result_index < history_size   && matches_all_searches(history[search_result_index]);
+			bool matches_older    = search_result_index > 0              && matches_all_searches(history[search_result_index - 1]);
+			bool matches_newer    = search_result_index < history_size-1 && matches_all_searches(history[search_result_index + 1]);
+
 			// search in the history array
 			if (action == SEARCH_BACKWARD) {
 				for (i = search_result_index - 1; i >= 0; i--) {
@@ -960,6 +970,21 @@ int main(int argc, char **argv) {
 						search_result_index = i;
 						matching_entry = current_entry;
 						break;
+					}
+				}
+			} else if (action == SCROLL_BACK) {
+				// If we reach a new search result by scrolling, increase the search_index
+				if (matches_current) {
+					search_succeeded = true;
+					search_index++;
+				}
+			} else if	(action == SCROLL_FORTH) {
+				// If we leave a search result by scrolling, decrease the search_index
+				if (matches_current) {
+					search_succeeded = true;
+				} else {
+					if (matches_older) {
+						search_index--;
 					}
 				}
 			}
@@ -1233,10 +1258,7 @@ int main(int argc, char **argv) {
 				search_result_index--;
 			}
 
-			buffer[0] = '\0';
-			buffer_pos = 0;
 			action = SCROLL_BACK;
-			search_index = 0;
 
 			break;
 
@@ -1246,10 +1268,7 @@ int main(int argc, char **argv) {
 				search_result_index++;
 			}
 
-			buffer[0] = '\0';
-			buffer_pos = 0;
 			action = SCROLL_FORTH;
-			search_index = 0;
 
 			break;
 
