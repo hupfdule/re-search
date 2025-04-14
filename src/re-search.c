@@ -97,14 +97,15 @@
 		if (no_of_subsearches > 0) { \
 			fprintf(stderr, "%s", CYAN); \
 			for (int i= 0; i < no_of_subsearches; i++) { \
-				int substr_len = utf8_strlen(subsearches[i]); \
-				if (subsearches[i][substr_len-1] == '\1'){ \
+				char *subsearch= subsearches[i]; \
+				int substr_len = utf8_strlen(subsearch); \
+				if (subsearch[substr_len-1] == '\1'){ \
 					char negative_term[substr_len-1]; \
-					memcpy(negative_term, subsearches[i], substr_len-1); \
+					memcpy(negative_term, subsearch, substr_len-1); \
 					negative_term[substr_len-1] = '\0'; \
 					fprintf(stderr, "%s[%s%s!%s%s%s]%s", FAINT, NORMAL, RED, CYAN, negative_term, FAINT, NORMAL); \
 				} else { \
-					fprintf(stderr, "%s[%s%s%s]%s", FAINT, NORMAL, subsearches[i], FAINT, NORMAL); \
+					fprintf(stderr, "%s[%s%s%s]%s", FAINT, NORMAL, subsearch, FAINT, NORMAL); \
 				} \
 			} \
 			fprintf(stderr, "%s", RESET); \
@@ -682,17 +683,18 @@ void cancel() {
 
 int matches_all_searches(char *history_entry) {
 	for (int i=0; i < no_of_subsearches; i++) {
-		int substr_len = utf8_strlen(subsearches[i]);
+		char *subsearch= subsearches[i];
+		int substr_len = utf8_strlen(subsearch);
 		int negative = 0;
 		char negatives[substr_len-1];
-		if (subsearches[i][substr_len-1] == '\1') {
+		if (subsearch[substr_len-1] == '\1') {
 			// negative substring
-			memcpy(negatives, subsearches[i], substr_len-1);
+			memcpy(negatives, subsearch, substr_len-1);
 			negatives[substr_len-1] = '\0';
 			negative = 1;
 		}
 
-		if (!negative && !strstr(history_entry, subsearches[i])) {
+		if (!negative && !strstr(history_entry, subsearch)) {
 			return 0;
 		} else if (negative && strstr(history_entry, negatives)) {
 			return 0;
@@ -933,6 +935,8 @@ int main(int argc, char **argv) {
 	bool noop = false;
 	while (1) {
 		search_succeeded = false;
+		char *matching_entry = NULL;
+
 		if (!noop && (buffer_pos > 0 || no_of_subsearches > 0)) {
 			// search in the history array
 			if (action == SEARCH_BACKWARD) {
@@ -942,14 +946,7 @@ int main(int argc, char **argv) {
 						search_succeeded = true;
 						search_index++;
 						search_result_index = i;
-						if (negate) {
-							substring_index = -1;
-						} else {
-							char *substring = strstr(current_entry, buffer);
-							if (substring) {
-								substring_index = utf8_chars_until_substr(current_entry, buffer);
-							}
-						}
+						matching_entry = current_entry;
 						break;
 					}
 				}
@@ -960,19 +957,22 @@ int main(int argc, char **argv) {
 						search_succeeded = true;
 						search_index--;
 						search_result_index = i;
-						if (negate) {
-							substring_index = -1;
-						} else {
-							char *substring = strstr(current_entry, buffer);
-							if (substring) {
-								substring_index = utf8_chars_until_substr(current_entry, buffer);
-							}
-						}
+						matching_entry = current_entry;
 						break;
 					}
 				}
 			}
 		}
+
+		if (negate || matching_entry == NULL) {
+			substring_index = -1;
+		} else {
+			char *substring = strstr(matching_entry, buffer);
+			if (substring) {
+				substring_index = utf8_chars_until_substr(matching_entry, buffer);
+			}
+		}
+
 		noop = false;
 
 		// erase line
