@@ -975,12 +975,14 @@ int main(int argc, char **argv) {
 			} else if (action == SCROLL_BACK) {
 				// If we reach a new search result by scrolling, increase the search_index
 				if (matches_current) {
+					matching_entry = history[search_result_index];
 					search_succeeded = true;
 					search_index++;
 				}
 			} else if	(action == SCROLL_FORTH) {
 				// If we leave a search result by scrolling, decrease the search_index
 				if (matches_current) {
+					matching_entry = history[search_result_index];
 					search_succeeded = true;
 				} else {
 					if (matches_older) {
