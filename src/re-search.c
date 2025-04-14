@@ -1177,6 +1177,12 @@ int main(int argc, char **argv) {
 				negate = false;
 			}
 
+			if (no_of_subsearches >= MAX_SUBSEARCHES) {
+				error("Only %i search terms are supported.", MAX_SUBSEARCHES + 1);
+				noop = true;
+				break;
+			}
+
 			strcpy(subsearches[no_of_subsearches], buffer);
 			no_of_subsearches++;
 
