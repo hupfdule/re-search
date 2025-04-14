@@ -65,7 +65,7 @@
 #endif /* DEBUG */
 
 #define error(fmt, ...) \
-	fprintf(stderr, fmt "\n", ##__VA_ARGS__)
+	fprintf(stderr, "\n" RED fmt RESET "\n", ##__VA_ARGS__)
 
 #ifndef PROMPT
 #define PROMPT(buffer, action, index, result) \
