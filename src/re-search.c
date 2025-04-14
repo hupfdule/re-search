@@ -81,7 +81,8 @@
 				action_str = "forward"; \
 				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
-			case SCROLL: \
+			case SCROLL_BACK: \
+			case SCROLL_FORTH: \
 				action_str = ""; \
 				action_color = CYAN; \
 				break; \
@@ -168,7 +169,7 @@
 #define FISH_MIN_CMD_LEN     BASH_MIN_CMD_LEN + FISH_CMD_PREFIX_LEN
 
 typedef enum {
-	SEARCH_BACKWARD, SEARCH_FORWARD, SCROLL, EXECUTE,
+	SEARCH_BACKWARD, SEARCH_FORWARD, SCROLL_BACK, SCROLL_FORTH, EXECUTE,
 } action_t;
 
 /* will be used as exit code to differenciate cases */
@@ -922,7 +923,7 @@ int main(int argc, char **argv) {
 	if (start_index && utf8_strlen(start_index) > 0) {
 		int idx= strtol(start_index, NULL, 10);
 		search_result_index = history_size - idx;
-		action = SCROLL;
+		action = SCROLL_BACK;
 
 		// ignore $SEARCH_BUFFER
 		buffer[0] = '\0';
@@ -1180,7 +1181,7 @@ int main(int argc, char **argv) {
 		// Delete from cursor to beginning of line
 		case 21: // C-u
 			// when scrolling or executing from history end re-search and execute Ctrl-u
-			if (action == SCROLL || action == EXECUTE) {
+			if (action == SCROLL_BACK || action == SCROLL_FORTH || action == EXECUTE) {
 				write_readline_function("backward-kill-line");
 				accept(RESULT_EDIT);
 				break;
@@ -1200,7 +1201,7 @@ int main(int argc, char **argv) {
 		// Delete from cursor to beginning of word
 		case 23: // C-w
 			// when scrolling or executing from history end re-search and execute Ctrl-w
-			if (action == SCROLL || action == EXECUTE) {
+			if (action == SCROLL_BACK || action == SCROLL_FORTH || action == EXECUTE) {
 				write_readline_function("backward-kill-word");
 				accept(RESULT_EDIT);
 				break;
@@ -1234,7 +1235,7 @@ int main(int argc, char **argv) {
 
 			buffer[0] = '\0';
 			buffer_pos = 0;
-			action = SCROLL;
+			action = SCROLL_BACK;
 			search_index = 0;
 
 			break;
@@ -1247,7 +1248,7 @@ int main(int argc, char **argv) {
 
 			buffer[0] = '\0';
 			buffer_pos = 0;
-			action = SCROLL;
+			action = SCROLL_FORTH;
 			search_index = 0;
 
 			break;
@@ -1256,7 +1257,7 @@ int main(int argc, char **argv) {
 		case 127: // backspace
 		case 8: // backspace
 			// when scrolling or executing from history end re-search and execute Ctrl-h
-			if (action == SCROLL || action == EXECUTE) {
+			if (action == SCROLL_BACK || action == SCROLL_FORTH || action == EXECUTE) {
 				write_readline_function("backward-delete-char");
 				accept(RESULT_EDIT);
 				break;
@@ -1329,7 +1330,7 @@ int main(int argc, char **argv) {
 
 			// entering a printable character while scrolling ends the scrolling
 			// and appends the new character
-			if (action == SCROLL) {
+			if (action == SCROLL_BACK || action == SCROLL_FORTH) {
 				const char *utf8_char = buffer + buffer_pos - remaining_bytes - 1;
 				write_append_char(utf8_char);
 				accept(RESULT_EDIT);
