@@ -1356,8 +1356,9 @@ int main(int argc, char **argv) {
 			}
 
 			// entering a printable character while scrolling ends the scrolling
-			// and appends the new character
-			if (action == SCROLL_BACK || action == SCROLL_FORTH) {
+			// and appends the new character, unless there is already a search term
+			if ((action == SCROLL_BACK || action == SCROLL_FORTH)
+					&& buffer_pos - remaining_bytes == 1) {
 				const char *utf8_char = buffer + buffer_pos - remaining_bytes - 1;
 				write_append_char(utf8_char);
 				accept(RESULT_EDIT);
