@@ -74,19 +74,19 @@
 		char *action_color; \
 		switch (action) { \
 			case SEARCH_BACKWARD: \
-				action_str = "backward"; \
+				action_str = "🔍🡱 bkwd"; \
 				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
 			case SEARCH_FORWARD: \
-				action_str = "forward"; \
+				action_str = "🔍🡳 fwrd"; \
 				action_color = search_index > 0 ? (search_succeeded ? GREEN : YELLOW) : RED; \
 				break; \
 			case SCROLL_BACK: \
-				action_str = "↑"; \
+				action_str = "👣⮙ bkwd"; \
 				action_color = GREEN; \
 			  break; \
 			case SCROLL_FORTH: \
-				action_str = "↓"; \
+				action_str = "👣⮛ fwrd"; \
 				action_color = GREEN; \
 				break; \
 			case EXECUTE: \
