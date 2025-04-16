@@ -947,7 +947,9 @@ int main(int argc, char **argv) {
 			// search_index only if step away from a maching history entry.
 			bool matches_current  = search_result_index < history_size   && matches_all_searches(history[search_result_index]);
 			bool matches_older    = search_result_index > 0              && matches_all_searches(history[search_result_index - 1]);
-			//bool matches_newer    = search_result_index < history_size-1 && matches_all_searches(history[search_result_index + 1]);
+			bool matches_newer    = search_result_index < history_size-1 && matches_all_searches(history[search_result_index + 1]);
+
+			debug("Matches older | current | newer:  %i %i %i", matches_older, matches_current, matches_newer);
 
 			// search in the history array
 			if (action == SEARCH_BACKWARD) {
