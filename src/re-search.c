@@ -968,7 +968,9 @@ int main(int argc, char **argv) {
 					char *current_entry= history[i];
 					if (matches_all_searches(current_entry)) {
 						search_succeeded = true;
-						search_index--;
+						if (matches_current) {
+							search_index--;
+						}
 						search_result_index = i;
 						matching_entry = current_entry;
 						break;
