@@ -334,7 +334,7 @@ int append_to_history(const char *cmdline) {
 	}
 
 	// append to history array
-	int len = utf8_strlen(cmdline);
+	int len = strlen(cmdline);
 	history[history_size] = malloc(len + 1);
 	if (!history[history_size]) {
 		error("cannot allocate memory");
